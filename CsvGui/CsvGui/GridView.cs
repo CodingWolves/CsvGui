@@ -11,13 +11,13 @@ using System.Windows.Forms;
 
 namespace CsvGui
 {
-    public partial class Form1 : Form
+    public partial class GridView : Form
     {
         private CsvForm form = null;
-        public Form1()
+        public GridView(CsvForm form)
         {
             InitializeComponent();
-            form = CsvReader.ReadFile("C:\\Users\\IDO\\Documents\\GitHub\\CsvGui\\Tests\\small.csv", true);
+            this.form = form;
             RefreshDataGrid();
         }
 
@@ -48,7 +48,7 @@ namespace CsvGui
         {
             if (e.StateChanged == DataGridViewElementStates.Selected)
             {
-                StripCellPositionLabel.Text = string.Format("row {0}, column {1}", e.Cell.RowIndex, e.Cell.ColumnIndex);
+                StripCellPositionLabel.Text = string.Format("row {0}, column {1}", e.Cell.RowIndex+ (form.HasHead() ? 2 : 1), e.Cell.ColumnIndex+1);
             }
         }
     }

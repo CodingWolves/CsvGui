@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Csv;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -16,7 +17,8 @@ namespace CsvGui
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new Form1());          
+            CsvForm form = CsvReader.ReadFile("C:\\Users\\IDO\\Documents\\GitHub\\CsvGui\\Tests\\big.csv", true);
+            Application.Run(new GridView(form));          
         }
     }
 }

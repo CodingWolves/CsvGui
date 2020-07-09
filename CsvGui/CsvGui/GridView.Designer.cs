@@ -1,6 +1,6 @@
 ﻿namespace CsvGui
 {
-    partial class Form1
+    partial class GridView
     {
         /// <summary>
         /// Required designer variable.

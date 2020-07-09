@@ -25,6 +25,10 @@ namespace Csv
         {
             this.headRow = headRow;
         }
+        public bool HasHead()
+        {
+            return headRow != null;
+        }
 
         public CsvItem this[int rowIndex, int columnIndex]
         {
