@@ -16,8 +16,7 @@ namespace CsvGui
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new Form1());
-            Csv.CsvReader.ReadLine();
+            Application.Run(new Form1());          
         }
     }
 }

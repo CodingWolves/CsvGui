@@ -6,101 +6,47 @@ using System.Text.RegularExpressions;
 
 namespace Csv
 {
-    public class CsvForm:IEnumerable
-    {
-        public List<CsvRow> rows = null;
-        public CsvForm()
-        {
-            this.rows = new List<CsvRow>();
-        }
-        public CsvForm(CsvForm form):this()
-        {
-            this.rows.AddRange(form.rows);
-        }
-
-        public IEnumerator GetEnumerator()
-        {
-            return this.rows.GetEnumerator();
-        }
-    }
-
-    public class CsvRow:IEnumerable
-    {
-        protected bool isHead = false;
-        public List<CsvItem> items = null;
-        public CsvRow()
-        {
-            this.items = new List<CsvItem>();
-        }
-        public CsvRow(CsvRow row):this()
-        {
-            this.isHead = row.isHead;
-            this.items.AddRange(row.items);
-        }
-
-        public bool IsHead
-        {
-            get
-            {
-                return this.isHead;
-            }
-        }
-        public void SetAsHead()
-        {
-            this.isHead = true;
-        }
-
-        public CsvItem this[int index]
-        {
-            get
-            {
-                return this.items[index];
-            }
-            set
-            {
-                this.items[index] = value;
-            }
-        }
-
-        public IEnumerator GetEnumerator()
-        {
-            return this.items.GetEnumerator();
-        }
-    }
-
-    
-
     public class CsvReader
     {
-        public static CsvForm ReadFile(string filename)
+        public static CsvForm ReadFile(string filename, bool hasHead)
         {
-            return null;
+            CsvForm form = new CsvForm();
+            StreamReader stream = new StreamReader(filename);
+            if (hasHead && !stream.EndOfStream)
+            {
+                form.SetHeadRow(ReadRow(stream));
+            }
+            while (!stream.EndOfStream)
+            {
+                form.AddRow(ReadRow(stream));
+            }
+            stream.Close();
+            return form;
         }
 
-        public static CsvRow ReadLine()//StreamReader stream)
+        public static CsvRow ReadRow(StreamReader stream)
         {
-            //string line = stream.ReadLine();
-            string line = "123,443,6547,8678,,,,,,,7657,,657,";
-
-            MatchCollection itemSplit = Regex.Matches(line, "(?:^|,)(?=[^\"]|(\")?)\"?((?(1)[^\"]*|[^,\"]*))\"?(?=,|$)");
-
-            string[] itemsValue = new string[14];
-            foreach (Match match in itemSplit)
+            string line = stream.ReadLine();
+            //string line = ",123,";
+            CsvRow row = new CsvRow();
+            while (line.StartsWith(",")) // regex has a problem with empty items at start
             {
-
+                row.AddItem(new CsvString(String.Empty, row));
+                line = line.Remove(0, 1);
             }
-
-            return null;
+            MatchCollection itemMatches = Regex.Matches(line, "(?:^|,)(?=[^\"]|(\")?)\"?(?(1)[^\"]*|[^,\"]*)\"?(?=,|$)"); // Csv regex format            
+            foreach (Match match in itemMatches)
+            {
+                string itemValue = match.Value.StartsWith(",") ? match.Value.Remove(0, 1) : match.Value;
+                CsvString item = new CsvString(itemValue, row);
+                row.AddItem(item);
+            }
+            return row;
         }
 
-        public static Csv.CsvItem GetCsvItem(object obj)
+        public static CsvItem GetCsvItem(object obj)
         {
-            if (obj is string)
-            {
-                return new Csv.CsvString((string)obj);
-            }
-
-            return null;
+            throw new NotImplementedException();
         }
     }
 }
