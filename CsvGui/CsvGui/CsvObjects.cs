@@ -26,9 +26,45 @@ namespace Csv
             this.headRow = headRow;
         }
 
-        public void UpdateValue(int rowIndex, int itemIndex, object value)
+        public CsvItem this[int rowIndex, int columnIndex]
         {
-            this.rows[rowIndex].UpdateValue(itemIndex, value);
+            get
+            {
+                return this.rows[rowIndex][columnIndex];
+            }
+        }    
+        public CsvRow this[int rowIndex]
+        {
+            get
+            {
+                return this.rows[rowIndex];
+            }
+        }
+
+        public void UpdateValue(int rowIndex, int columnIndex, object value)
+        {
+            while (rowIndex >= this.rows.Count)
+            {
+                this.rows.Add(new CsvRow());
+            }
+            this.rows[rowIndex].UpdateValue(columnIndex, value);
+        }
+
+        public List<CsvItem> GetColumnItems(int columnIndex)
+        {
+            List<CsvItem> items = new List<CsvItem>();
+            foreach (CsvRow row in this.rows)
+            {
+                if (columnIndex < row.items.Count)
+                {
+                    items.Add((CsvItem)row[columnIndex].Clone());
+                }
+                else
+                {
+                    items.Add(new CsvString(String.Empty));
+                }
+            }
+            return items;
         }
 
         public IEnumerator GetEnumerator()
@@ -80,10 +116,19 @@ namespace Csv
 
         public void UpdateValue(int itemIndex, object value)
         {
-            if (value is string && this.items[itemIndex] is CsvString)
+            while (itemIndex >= this.items.Count)
+            {
+                this.items.Add(CsvItem.Null);
+            }
+            if (value.GetType() == this.items[itemIndex].GetValueType() )
             {
                 this.items[itemIndex].UpdateValue(value);
             }
+            else
+            {
+                this.items[itemIndex] = CsvItem.CreateCsvItem(value, this);
+            }
+                
         }
 
         public IEnumerator GetEnumerator()
@@ -95,19 +140,51 @@ namespace Csv
 
     public abstract class CsvItem : ICloneable
     {
+        public static readonly CsvItem Null = new CsvItemNull();
+        public static CsvItem CreateCsvItem(object value, CsvRow parent)
+        {
+            return new CsvString((string)value, parent);
+        }
+
         protected CsvRow parent = null;
 
         public abstract object GetValue();
+        public abstract Type GetValueType();
 
         public abstract void UpdateValue(object value);
 
-        public abstract bool IsNull();
+        public bool IsNull()
+        {
+            return this is CsvItemNull;
+        }
         public CsvRow GetParent()
         {
             return parent;
         }
         public abstract object Clone();
-        
+
+        private class CsvItemNull : CsvItem
+        {
+            public override object Clone()
+            {
+                return this;
+            }
+
+            public override object GetValue()
+            {
+                return null;
+            }
+
+            public override Type GetValueType()
+            {
+                return null;
+            }
+
+            public override void UpdateValue(object value)
+            {
+                return;
+            }
+        }
     }
 
     public class CsvString : CsvItem
@@ -129,14 +206,13 @@ namespace Csv
         {
             return this.value;
         }
+        public override Type GetValueType()
+        {
+            return value.GetType();
+        }
         public override void UpdateValue(object value)
         {
             this.value = (string)value;
-        }
-
-        public override bool IsNull()
-        {
-            return String.IsNullOrEmpty(this.value);
         }
 
         public override object Clone()
