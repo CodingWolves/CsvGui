@@ -23,6 +23,8 @@ namespace CsvGui
 
         private void dataGridView_CellValueChanged(object sender, DataGridViewCellEventArgs e)
         {
+            if (e.ColumnIndex < 0)
+                return;
             form.UpdateValue(e.RowIndex, e.ColumnIndex, dataGridView[e.ColumnIndex,e.RowIndex].Value);
             //RefreshDataGrid();
         }
@@ -39,6 +41,14 @@ namespace CsvGui
             {
                 object[] rowValues = row.GetAllValues().ToArray();
                 dataGridView.Rows.Add(rowValues);
+            }
+        }
+
+        private void dataGridView_CellStateChanged(object sender, DataGridViewCellStateChangedEventArgs e)
+        {
+            if (e.StateChanged == DataGridViewElementStates.Selected)
+            {
+                StripCellPositionLabel.Text = string.Format("row {0}, column {1}", e.Cell.RowIndex, e.Cell.ColumnIndex);
             }
         }
     }
