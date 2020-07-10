@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CsvGui.Properties;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -54,7 +55,7 @@ namespace CsvGui
         {
             InitializeComponent();
             this.StartPosition = FormStartPosition.CenterScreen;
-            this.Text = "Loading " + loadingName;
+            this.Text = Resources.LOADING_STRING + loadingName;
             this.LoadingNameLabel.Text = loadingName;
         }
 

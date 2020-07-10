@@ -61,11 +61,47 @@ namespace CsvGui.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to ..\\..\\..\\..\\Tests\\big.csv.
+        /// </summary>
+        internal static string BIG_CSV_FILENAME {
+            get {
+                return ResourceManager.GetString("BIG_CSV_FILENAME", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ..\\..\\..\\..\\Tests\\humongus.csv.
+        /// </summary>
+        internal static string HUMONGUS_CSV_FILENAME {
+            get {
+                return ResourceManager.GetString("HUMONGUS_CSV_FILENAME", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Loading .
         /// </summary>
-        internal static string LoadingString {
+        internal static string LOADING_STRING {
             get {
-                return ResourceManager.GetString("LoadingString", resourceCulture);
+                return ResourceManager.GetString("LOADING_STRING", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ..\\..\\..\\..\\Tests\\minor.csv.
+        /// </summary>
+        internal static string MINOR_CSV_FILENAME {
+            get {
+                return ResourceManager.GetString("MINOR_CSV_FILENAME", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ..\\..\\..\\..\\Tests\\small.csv.
+        /// </summary>
+        internal static string SMALL_CSV_FILENAME {
+            get {
+                return ResourceManager.GetString("SMALL_CSV_FILENAME", resourceCulture);
             }
         }
     }
