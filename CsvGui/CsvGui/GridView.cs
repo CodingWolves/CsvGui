@@ -26,18 +26,23 @@ namespace CsvGui
             this.editEnabled = editEnabled;
             RefreshDataGrid();
         }
-        public GridView(CsvForm form, bool editEnabled, string gridName):this(form,editEnabled)
+        public GridView(CsvForm form, bool editEnabled, string gridName) : this(form, editEnabled)
         {
             this.Name = gridName;
         }
 
         private void dataGridView_CellValueChanged(object sender, DataGridViewCellEventArgs e)
         {
-            if (e.ColumnIndex < 0)
+            if (e.ColumnIndex < 0) // row name change caught
             {
                 return;
             }
-            form.UpdateValue(e.RowIndex, e.ColumnIndex, dataGridView[e.ColumnIndex,e.RowIndex].Value);
+            DataGridViewCell cell = dataGridView[e.ColumnIndex, e.RowIndex];
+            if (cell.Value is string)
+            {
+                itemEdit.UpdateValue(cell.Value);
+                cell.Value = itemEdit; // recursive method by calling cell.Value to set to CsvItem
+            }
             //RefreshDataGrid();
         }
 
@@ -47,11 +52,11 @@ namespace CsvGui
             dataGridView.Columns.Clear();
             foreach (CsvItem item in form.headRow)
             {
-                dataGridView.Columns.Add((string)item.GetValue(), (string)item.GetValue());
+                dataGridView.Columns.Add(item.index.ToString(), item.ToString());
             }
             foreach (CsvRow row in form.rows)
             {
-                object[] rowValues = row.GetAllValues().ToArray();
+                object[] rowValues = row.items.ToArray();
                 dataGridView.Rows.Add(rowValues);
             }
         }
@@ -60,8 +65,54 @@ namespace CsvGui
         {
             if (e.StateChanged == DataGridViewElementStates.Selected)
             {
-                StripCellPositionLabel.Text = string.Format("row {0}, column {1}", e.Cell.RowIndex+ (form.HasHead() ? 2 : 1), e.Cell.ColumnIndex+1);
+                if (e.Cell.Value is CsvItem)
+                {
+                    CsvItem item = (CsvItem)e.Cell.Value;
+                    StripCellPositionLabel.Text = string.Format("row {0}, column {1}", item.GetParent().index, item.index);
+                }
+                else
+                {
+
+                }
             }
+        }
+
+        private CsvItem itemEdit = null;
+        private void dataGridView_CellBeginEdit(object sender, DataGridViewCellCancelEventArgs e)
+        {
+            DataGridViewCell cell = dataGridView[e.ColumnIndex, e.RowIndex];
+            if (cell.Value is CsvItem)
+            {
+                itemEdit = (CsvItem)cell.Value;
+            }
+        }
+
+        private void dataGridView_RowStateChanged(object sender, DataGridViewRowStateChangedEventArgs e)
+        {
+            if (e.StateChanged == DataGridViewElementStates.Selected)
+            {
+                DataGridViewCell firstCell = e.Row.Cells[0];
+                if (firstCell.Value is CsvItem)
+                {
+                    CsvItem item = (CsvItem)firstCell.Value;
+                    StripCellPositionLabel.Text = string.Format("row {0}", item.GetParent().index);
+                }
+            }
+        }
+
+        private void dataGridView_ColumnStateChanged(object sender, DataGridViewColumnStateChangedEventArgs e)
+        {
+            if (e.StateChanged == DataGridViewElementStates.Selected)
+            {
+                int columnIndex = int.Parse(e.Column.Name);
+                StripCellPositionLabel.Text = string.Format("column {0}", columnIndex);
+
+            }
+        }
+
+        private void dataGridView_RowsAdded(object sender, DataGridViewRowsAddedEventArgs e)
+        {
+
         }
     }
 }
