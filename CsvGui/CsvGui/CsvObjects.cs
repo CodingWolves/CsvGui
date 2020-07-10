@@ -11,6 +11,7 @@ namespace Csv
         public CsvForm()
         {
             this.rows = new List<CsvRow>();
+            this.headRow = new CsvRow();
         }
         public CsvForm(CsvForm form) : this()
         {
@@ -20,14 +21,14 @@ namespace Csv
         public void AddRow(CsvRow row)
         {
             rows.Add(row);
+            while (row.items.Count> headRow.items.Count)
+            {
+                headRow.AddItem(new CsvString("",headRow, headRow.items.Count));
+            }
         }
         public void SetHeadRow(CsvRow headRow)
         {
             this.headRow = headRow;
-        }
-        public bool HasHead()
-        {
-            return headRow != null;
         }
 
         public CsvItem this[int rowIndex, int columnIndex]
@@ -80,6 +81,7 @@ namespace Csv
     public class CsvRow : IEnumerable
     {
         public List<CsvItem> items = null;
+        public int index = -1;
         public CsvRow()
         {
             this.items = new List<CsvItem>();
@@ -90,6 +92,10 @@ namespace Csv
             {
                 this.items.Add((CsvItem)item.Clone());
             }
+        }
+        public CsvRow(int rowIndex):this()
+        {
+            this.index = rowIndex;
         }
 
         public CsvItem this[int index]
@@ -130,7 +136,7 @@ namespace Csv
             }
             else
             {
-                this.items[itemIndex] = CsvItem.CreateCsvItem(value, this);
+                this.items[itemIndex] = CsvItem.CreateCsvItem(value, this, this.items[itemIndex].index);
             }
                 
         }
@@ -145,12 +151,13 @@ namespace Csv
     public abstract class CsvItem : ICloneable
     {
         public static readonly CsvItem Null = new CsvItemNull();
-        public static CsvItem CreateCsvItem(object value, CsvRow parent)
+        public static CsvItem CreateCsvItem(object value, CsvRow parent, int index)
         {
-            return new CsvString((string)value, parent);
+            return new CsvString((string)value, parent, index);
         }
 
         protected CsvRow parent = null;
+        public int index = -1;
 
         public abstract object GetValue();
         public abstract Type GetValueType();
@@ -166,6 +173,7 @@ namespace Csv
             return parent;
         }
         public abstract object Clone();
+        public override abstract string ToString();
 
         private class CsvItemNull : CsvItem
         {
@@ -180,6 +188,11 @@ namespace Csv
             }
 
             public override Type GetValueType()
+            {
+                return null;
+            }
+
+            public override string ToString()
             {
                 return null;
             }
@@ -203,6 +216,10 @@ namespace Csv
         {
             this.parent = parent;
         }
+        public CsvString(string str, CsvRow parent, int itemIndex) : this(str, parent)
+        {
+            this.index = itemIndex;
+        }
         public CsvString(CsvString item) : this(item.value, item.parent)
         {
         }
@@ -224,6 +241,9 @@ namespace Csv
             return new CsvString(this);
         }
 
-        
+        public override string ToString()
+        {
+            return this.value.ToString();
+        }
     }
 }
