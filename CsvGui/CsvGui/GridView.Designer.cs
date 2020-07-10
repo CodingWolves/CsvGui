@@ -64,15 +64,15 @@
             this.StripCellPositionLabel.Size = new System.Drawing.Size(25, 17);
             this.StripCellPositionLabel.Text = "0, 0";
             // 
-            // Form1
+            // GridView
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
             this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.dataGridView);
-            this.Name = "Form1";
-            this.Text = "Form1";
+            this.Name = "GridView";
+            this.Text = "GridView";
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView)).EndInit();
             this.statusStrip1.ResumeLayout(false);
             this.statusStrip1.PerformLayout();

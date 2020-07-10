@@ -14,17 +14,29 @@ namespace CsvGui
     public partial class GridView : Form
     {
         private CsvForm form = null;
-        public GridView(CsvForm form)
+        private bool editEnabled = false;
+        public GridView(CsvForm form, bool editEnabled)
         {
             InitializeComponent();
+            if (form == null)
+            {
+                return;
+            }
             this.form = form;
+            this.editEnabled = editEnabled;
             RefreshDataGrid();
+        }
+        public GridView(CsvForm form, bool editEnabled, string gridName):this(form,editEnabled)
+        {
+            this.Name = gridName;
         }
 
         private void dataGridView_CellValueChanged(object sender, DataGridViewCellEventArgs e)
         {
             if (e.ColumnIndex < 0)
+            {
                 return;
+            }
             form.UpdateValue(e.RowIndex, e.ColumnIndex, dataGridView[e.ColumnIndex,e.RowIndex].Value);
             //RefreshDataGrid();
         }
