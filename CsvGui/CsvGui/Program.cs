@@ -25,9 +25,9 @@ namespace CsvGui
             string filePath = Resources.SMALL_CSV_FILENAME;
 
             DateTime start = DateTime.Now;
-            CsvForm form = Csv.Csv.ReadFile(filePath, true);
-            //CsvForm form = CsvReader.ReadFile(filePath, true, 32438);
-            //CsvForm form = CsvReader.ReadFile(filePath, true, new TimeSpan(0,0,0,0,10));
+            CsvForm form = Csv.Csv.LoadCsv(filePath, true);
+            //CsvForm form = CsvReader.LoadCsv(filePath, true, 32438);
+            //CsvForm form = CsvReader.LoadCsv(filePath, true, new TimeSpan(0,0,0,0,10));
             //MessageBox.Show(DateTime.Now.Subtract(start).Milliseconds + " milisecs to read");
 
             //GridView gridView = LoadingScreen.ConstructForm<GridView>(form);

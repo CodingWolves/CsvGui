@@ -8,24 +8,24 @@ namespace Csv
 {
     public class Csv
     {
-        public static CsvForm ReadFile(string filePath, bool hasHead)
+        public static CsvForm LoadCsv(string filePath, bool hasHead)
         {
-            return ReadFile(filePath, hasHead, 0, int.MaxValue, TimeSpan.MaxValue);
+            return LoadCsv(filePath, hasHead, 0, int.MaxValue, TimeSpan.MaxValue);
         }
-        public static CsvForm ReadFile(string filePath, bool hasHead, int rowOffset)
+        public static CsvForm LoadCsv(string filePath, bool hasHead, int rowOffset)
         {
-            return ReadFile(filePath, hasHead, rowOffset, int.MaxValue, TimeSpan.MaxValue);
+            return LoadCsv(filePath, hasHead, rowOffset, int.MaxValue, TimeSpan.MaxValue);
         }
-        public static CsvForm ReadFile(string filePath, bool hasHead, int rowOffset, int rows)
+        public static CsvForm LoadCsv(string filePath, bool hasHead, int rowOffset, int rows)
         {
-            return ReadFile(filePath, hasHead, rowOffset, rows, TimeSpan.MaxValue);
+            return LoadCsv(filePath, hasHead, rowOffset, rows, TimeSpan.MaxValue);
         }    
-        public static CsvForm ReadFile(string filePath, bool hasHead, TimeSpan readTimeSpan)
+        public static CsvForm LoadCsv(string filePath, bool hasHead, TimeSpan readTimeSpan)
         {
-            return ReadFile(filePath, hasHead, 0, int.MaxValue, readTimeSpan);
+            return LoadCsv(filePath, hasHead, 0, int.MaxValue, readTimeSpan);
         }
 
-        public static CsvForm ReadFile(string filePath, bool hasHead, int rowOffset, int rows, TimeSpan readTimeSpan)
+        public static CsvForm LoadCsv(string filePath, bool hasHead, int rowOffset, int rows, TimeSpan readTimeSpan)
         {
             DateTime startTime = DateTime.Now;
             CsvForm form = new CsvForm();
