@@ -46,6 +46,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ICsvFormable.cs" />
     <Compile Include="Csv.cs" />
     <Compile Include="CsvObjects.cs" />
     <Compile Include="GridView.cs">

@@ -11,7 +11,7 @@ using System.Windows.Forms;
 
 namespace CsvGui
 {
-    public partial class GridView : Form
+    public partial class GridView : Form , ICsvFormable
     {
         private CsvForm form = null;
         private bool editEnabled = false;
@@ -113,6 +113,21 @@ namespace CsvGui
         private void dataGridView_RowsAdded(object sender, DataGridViewRowsAddedEventArgs e)
         {
 
+        }
+
+        public void SetForm(CsvForm form)
+        {
+            if (form == null)
+            {
+                return;
+            }
+            this.form = form;
+            RefreshDataGrid();
+        }
+
+        public CsvForm GetForm()
+        {
+            return this.form;
         }
     }
 }
