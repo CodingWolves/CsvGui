@@ -20,14 +20,21 @@ namespace CsvGui
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new GridView());
+            //Application.Run(new GridView());
 
-            string filename = Resources.BIG_CSV_FILENAME;
+            string filePath = Resources.SMALL_CSV_FILENAME;
 
-            CsvForm form = CsvReader.ReadFile(filename, true);
-            GridView gridView = LoadingScreen.ConstructForm<GridView>(form);
+            DateTime start = DateTime.Now;
+            CsvForm form = Csv.Csv.ReadFile(filePath, true);
+            //CsvForm form = CsvReader.ReadFile(filePath, true, 32438);
+            //CsvForm form = CsvReader.ReadFile(filePath, true, new TimeSpan(0,0,0,0,10));
+            //MessageBox.Show(DateTime.Now.Subtract(start).Milliseconds + " milisecs to read");
 
-            Application.Run(gridView);
+            //GridView gridView = LoadingScreen.ConstructForm<GridView>(form);
+            //Application.Run(gridView);
+
+            Application.Run(new FormInfo(form));
+
             //form.Save(Resources.TEST_SAVE_CSV_FILENAME);
         }
     }
