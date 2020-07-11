@@ -1,4 +1,5 @@
-﻿using CsvGui.Properties;
+﻿using Csv;
+using CsvGui.Properties;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -15,33 +16,21 @@ namespace CsvGui
 {
     public partial class LoadingScreen : Form
     {
-
-        public static Class ConstructForm<Class>(params object[] args)
+        public static Class ConstructForm<Class>(CsvForm formArg) where Class : Csv.ICsvFormable, new()
         {
-            return ConstructForm<Class>("", args);
+            return ConstructForm<Class>(formArg, formArg.name);
         }
-        public static Class ConstructForm<Class>(string loadingName, params object[] args)
+        public static Class ConstructForm<Class>(CsvForm formArg, string loadingName) where Class : Csv.ICsvFormable , new()
         {
             LoadingScreen loadingScreen = new LoadingScreen(loadingName);
             Thread thread = new Thread(OpenLoadingScreen);
             thread.Start(loadingScreen);
 
-            Class form = ConstructClass<Class>(args);
+            Class classForm = new Class();
+            classForm.SetForm(formArg);
 
             loadingScreen.Stop();
-            return form;
-        }
-
-        public static Class ConstructClass<Class>(params object[] args)
-        {
-            IEnumerable<Type> argTypes = args.Select(arg => arg.GetType());
-            ConstructorInfo ctor = typeof(Class).GetConstructor(argTypes.ToArray());
-            if (ctor == null)
-            {
-                throw new ArgumentException();
-            }
-            Class obj = (Class)ctor.Invoke(args);
-            return obj;
+            return classForm;
         }
 
         private static void OpenLoadingScreen(object arg)

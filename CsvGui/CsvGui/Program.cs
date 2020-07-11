@@ -20,12 +20,12 @@ namespace CsvGui
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new GridView(null, false));
+            Application.Run(new GridView());
 
             string filename = Resources.BIG_CSV_FILENAME;
 
             CsvForm form = CsvReader.ReadFile(filename, true);
-            GridView gridView = LoadingScreen.ConstructForm<GridView>(Path.GetFileName(filename), form, true);
+            GridView gridView = LoadingScreen.ConstructForm<GridView>(form);
 
             Application.Run(gridView);
             //form.Save(Resources.TEST_SAVE_CSV_FILENAME);

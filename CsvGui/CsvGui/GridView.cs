@@ -15,20 +15,9 @@ namespace CsvGui
     {
         private CsvForm form = null;
         private bool editEnabled = false;
-        public GridView(CsvForm form, bool editEnabled)
+        public GridView()
         {
             InitializeComponent();
-            if (form == null)
-            {
-                return;
-            }
-            this.form = form;
-            this.editEnabled = editEnabled;
-            RefreshDataGrid();
-        }
-        public GridView(CsvForm form, bool editEnabled, string gridName) : this(form, editEnabled)
-        {
-            this.Name = gridName;
         }
 
         private void dataGridView_CellValueChanged(object sender, DataGridViewCellEventArgs e)
