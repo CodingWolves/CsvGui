@@ -129,6 +129,12 @@
   <data name="MINOR_CSV_FILENAME" xml:space="preserve">
     <value>..\\..\\..\\..\\Tests\\minor.csv</value>
   </data>
+  <data name="NUMBER_NULL_VALUES_STRING" xml:space="preserve">
+    <value> Null Values</value>
+  </data>
+  <data name="NUMBER_UNIQUE_VALUES_STRING" xml:space="preserve">
+    <value> Unique Values</value>
+  </data>
   <data name="SMALL_CSV_FILENAME" xml:space="preserve">
     <value>..\\..\\..\\..\\Tests\\small.csv</value>
   </data>

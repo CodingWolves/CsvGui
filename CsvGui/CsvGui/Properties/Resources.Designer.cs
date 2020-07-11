@@ -97,6 +97,24 @@ namespace CsvGui.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to  Null Values.
+        /// </summary>
+        internal static string NUMBER_NULL_VALUES_STRING {
+            get {
+                return ResourceManager.GetString("NUMBER_NULL_VALUES_STRING", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to  Unique Values.
+        /// </summary>
+        internal static string NUMBER_UNIQUE_VALUES_STRING {
+            get {
+                return ResourceManager.GetString("NUMBER_UNIQUE_VALUES_STRING", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to ..\\..\\..\\..\\Tests\\small.csv.
         /// </summary>
         internal static string SMALL_CSV_FILENAME {
