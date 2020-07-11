@@ -28,6 +28,7 @@ namespace CsvGui
             GridView gridView = LoadingScreen.ConstructForm<GridView>(Path.GetFileName(filename), form, true);
 
             Application.Run(gridView);
+            //form.Save(Resources.TEST_SAVE_CSV_FILENAME);
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 
 namespace Csv
 {
@@ -8,6 +9,7 @@ namespace Csv
     {
         public List<CsvRow> rows = null;
         public CsvRow headRow = null;
+        public bool editable = true;
         public string name = null;
         public CsvForm()
         {
@@ -76,6 +78,16 @@ namespace Csv
         public IEnumerator GetEnumerator()
         {
             return this.rows.GetEnumerator();
+        }
+
+        public void Save(string filePath)
+        {
+            StreamWriter stream = new StreamWriter(filePath, false);
+            foreach(CsvRow row in this.rows)
+            {
+                row.Save(stream);
+            }
+            stream.Close();
         }
     }
 
@@ -146,6 +158,18 @@ namespace Csv
         {
             return this.items.GetEnumerator();
         }
+
+        public void Save(StreamWriter stream)
+        {
+            if (this.items.Count > 0)
+                stream.Write(this.items[0].ToSaveableString());
+            for (int i=1;i<this.items.Count;i++)
+            {
+                stream.Write(',');
+                stream.Write(this.items[i].ToSaveableString());
+            }
+            stream.WriteLine();
+        }
     }
 
 
@@ -175,6 +199,7 @@ namespace Csv
         }
         public abstract object Clone();
         public override abstract string ToString();
+        public abstract string ToSaveableString();
 
         private class CsvItemNull : CsvItem
         {
@@ -191,6 +216,11 @@ namespace Csv
             public override Type GetValueType()
             {
                 return null;
+            }
+
+            public override string ToSaveableString()
+            {
+                return "";
             }
 
             public override string ToString()
@@ -245,6 +275,15 @@ namespace Csv
         public override string ToString()
         {
             return this.value.ToString();
+        }
+
+        public override string ToSaveableString()
+        {
+            if (this.value.IndexOf(",") >= 0)
+            {
+                return '"' + this.value + '"';
+            }
+            return this.value;
         }
     }
 }
