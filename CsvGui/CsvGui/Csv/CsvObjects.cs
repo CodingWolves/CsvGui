@@ -24,10 +24,7 @@ namespace Csv
         public void AddRow(CsvRow row)
         {
             rows.Add(row);
-            while (row.items.Count> headRow.items.Count)
-            {
-                headRow.AddItem(new CsvString("",headRow, headRow.items.Count));
-            }
+            this.ExpandHeadRow(row);
         }
         public void SetHeadRow(CsvRow headRow)
         {
@@ -38,14 +35,14 @@ namespace Csv
         {
             get
             {
-                return this.rows[rowIndex][columnIndex];
+                return this.GetRow(rowIndex).GetItem(columnIndex);
             }
         }    
         public CsvRow this[int rowIndex]
         {
             get
             {
-                return this.rows[rowIndex];
+                return this.GetRow(rowIndex);
             }
         }
 
@@ -57,21 +54,67 @@ namespace Csv
             }
             this.rows[rowIndex].UpdateValue(columnIndex, value);
         }
+        private void ExpandHeadRow(CsvRow row)
+        {
+            while (row.items.Count > headRow.items.Count)
+            {
+                headRow.AddItem(CsvItem.CreateNullCsvItem(headRow, headRow.items[headRow.items.Count-1].index+1));
+            }
+        }
+
+        public CsvRow GetRow(int rowIndex)
+        {
+            foreach (CsvRow row in this.rows)
+            {
+                if (row.index == rowIndex)
+                {
+                    return row;
+                }
+            }
+            return null;
+        }
 
         public List<CsvItem> GetColumnItems(int columnIndex)
         {
             List<CsvItem> items = new List<CsvItem>();
             foreach (CsvRow row in this.rows)
             {
-                if (columnIndex < row.items.Count)
+                if (columnIndex <= row.items.Count)
                 {
-                    items.Add((CsvItem)row[columnIndex].Clone());
+                    items.Add((CsvItem)row.GetItem(columnIndex).Clone());
                 }
                 else
                 {
-                    items.Add(new CsvString(String.Empty));
+                    items.Add(CsvItem.CreateNullCsvItem(row, row.items.Count));
                 }
             }
+            return items;
+        }
+
+        public List<CsvItem> GetUniqueValueColumnItems(int columnIndex)
+        {
+            List<CsvItem> items = GetColumnItems(columnIndex);
+
+            for (int i = 0; i < items.Count; i++)
+            {
+                object iValue = items[i].GetValue();
+                if (iValue == null)
+                {
+                    items.RemoveAt(i);
+                    i--;
+                    continue;
+                }
+                for (int j = i + 1; j < items.Count; j++)
+                {
+                    object jValue = items[j].GetValue();
+                    if (iValue.Equals(jValue))
+                    {
+                        items.RemoveAt(j);
+                        j--;
+                    }
+                }
+            }
+
             return items;
         }
 
@@ -115,11 +158,7 @@ namespace Csv
         {
             get
             {
-                return this.items[index];
-            }
-            set
-            {
-                this.items[index] = value;
+                return this.GetItem(index);
             }
         }
         public void AddItem(CsvItem item)
@@ -141,9 +180,9 @@ namespace Csv
         {
             while (itemIndex >= this.items.Count)
             {
-                this.items.Add(CsvItem.Null);
+                this.items.Add(CsvItem.CreateNullCsvItem(this, this.items.Count));
             }
-            if (value.GetType() == this.items[itemIndex].GetValueType() )
+            if (value.GetType() == this.items[itemIndex].GetValueType())
             {
                 this.items[itemIndex].UpdateValue(value);
             }
@@ -152,6 +191,18 @@ namespace Csv
                 this.items[itemIndex] = CsvItem.CreateCsvItem(value, this, this.items[itemIndex].index);
             }
                 
+        }
+
+        public CsvItem GetItem(int itemIndex)
+        {
+            foreach (CsvItem item in this.items)
+            {
+                if (item.index == itemIndex)
+                {
+                    return item;
+                }
+            }
+            return null;
         }
 
         public IEnumerator GetEnumerator()
@@ -178,7 +229,18 @@ namespace Csv
         public static readonly CsvItem Null = new CsvItemNull();
         public static CsvItem CreateCsvItem(object value, CsvRow parent, int index)
         {
+            if (value is null || (value is string && (string)value == ""))
+            {
+                return CreateNullCsvItem(parent, index);
+            }
             return new CsvString((string)value, parent, index);
+        }
+        public static CsvItem CreateNullCsvItem(CsvRow parent, int index)
+        {
+            CsvItemNull item = new CsvItemNull();
+            item.index = index;
+            item.parent = parent;
+            return item;
         }
 
         protected CsvRow parent = null;
@@ -225,7 +287,7 @@ namespace Csv
 
             public override string ToString()
             {
-                return null;
+                return "";
             }
 
             public override void UpdateValue(object value)

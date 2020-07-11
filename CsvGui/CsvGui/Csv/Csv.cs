@@ -6,7 +6,7 @@ using System.Text.RegularExpressions;
 
 namespace Csv
 {
-    public class CsvReader
+    public class Csv
     {
         public static CsvForm ReadFile(string filePath, bool hasHead)
         {
@@ -59,22 +59,20 @@ namespace Csv
             int itemCount = 0;
             while (line.StartsWith(",")) // regex has a problem with empty items at start
             {
-                row.AddItem(new CsvString(String.Empty, row, ++itemCount));
+                row.AddItem(CsvItem.CreateCsvItem(null,row,++itemCount));
                 line = line.Remove(0, 1);
             }
             MatchCollection itemMatches = Regex.Matches(line, "(?:^|,)(?=[^\"]|(\")?)\"?(?(1)[^\"]*|[^,\"]*)\"?(?=,|$)"); // Csv regex format, no normal parethesses allowed    
             foreach (Match match in itemMatches)
             {
                 string itemValue = match.Value.StartsWith(",") ? match.Value.Remove(0, 1) : match.Value;
-                CsvString item = new CsvString(itemValue, row, ++itemCount);
-                row.AddItem(item);
+                if (itemValue.StartsWith("\"") && itemValue.EndsWith("\""))
+                {
+                    itemValue = itemValue.Substring(1, itemValue.Length - 2);
+                }
+                row.AddItem(CsvItem.CreateCsvItem(itemValue, row, ++itemCount));
             }
             return row;
-        }
-
-        public static CsvItem GetCsvItem(object obj)
-        {
-            throw new NotImplementedException();
         }
     }
 }
