@@ -132,4 +132,7 @@
   <data name="SMALL_CSV_FILENAME" xml:space="preserve">
     <value>..\\..\\..\\..\\Tests\\small.csv</value>
   </data>
+  <data name="TEST_SAVE_CSV_FILENAME" xml:space="preserve">
+    <value>..\\..\\..\\..\\Tests\\test_save.csv</value>
+  </data>
 </root>

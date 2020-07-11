@@ -104,5 +104,14 @@ namespace CsvGui.Properties {
                 return ResourceManager.GetString("SMALL_CSV_FILENAME", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ..\\..\\..\\..\\Tests\\test_save.csv.
+        /// </summary>
+        internal static string TEST_SAVE_CSV_FILENAME {
+            get {
+                return ResourceManager.GetString("TEST_SAVE_CSV_FILENAME", resourceCulture);
+            }
+        }
     }
 }
