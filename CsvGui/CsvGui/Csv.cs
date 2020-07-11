@@ -8,28 +8,28 @@ namespace Csv
 {
     public class CsvReader
     {
-        public static CsvForm ReadFile(string filename, bool hasHead)
+        public static CsvForm ReadFile(string filePath, bool hasHead)
         {
-            return ReadFile(filename, hasHead, 0, int.MaxValue, TimeSpan.MaxValue);
+            return ReadFile(filePath, hasHead, 0, int.MaxValue, TimeSpan.MaxValue);
         }
-        public static CsvForm ReadFile(string filename, bool hasHead, int rowOffset)
+        public static CsvForm ReadFile(string filePath, bool hasHead, int rowOffset)
         {
-            return ReadFile(filename, hasHead, rowOffset, int.MaxValue, TimeSpan.MaxValue);
+            return ReadFile(filePath, hasHead, rowOffset, int.MaxValue, TimeSpan.MaxValue);
         }
-        public static CsvForm ReadFile(string filename, bool hasHead, int rowOffset, int rows)
+        public static CsvForm ReadFile(string filePath, bool hasHead, int rowOffset, int rows)
         {
-            return ReadFile(filename, hasHead, rowOffset, rows, TimeSpan.MaxValue);
+            return ReadFile(filePath, hasHead, rowOffset, rows, TimeSpan.MaxValue);
         }    
-        public static CsvForm ReadFile(string filename, bool hasHead, TimeSpan readTimeSpan)
+        public static CsvForm ReadFile(string filePath, bool hasHead, TimeSpan readTimeSpan)
         {
-            return ReadFile(filename, hasHead, 0, int.MaxValue, readTimeSpan);
+            return ReadFile(filePath, hasHead, 0, int.MaxValue, readTimeSpan);
         }
 
-        public static CsvForm ReadFile(string filename, bool hasHead, int rowOffset, int rows, TimeSpan readTimeSpan)
+        public static CsvForm ReadFile(string filePath, bool hasHead, int rowOffset, int rows, TimeSpan readTimeSpan)
         {
             DateTime startTime = DateTime.Now;
             CsvForm form = new CsvForm();
-            StreamReader stream = new StreamReader(filename);
+            StreamReader stream = new StreamReader(filePath);
             int rowCount = 0;
             if (hasHead && !stream.EndOfStream)
             {
@@ -60,7 +60,7 @@ namespace Csv
                 row.AddItem(new CsvString(String.Empty, row, ++itemCount));
                 line = line.Remove(0, 1);
             }
-            MatchCollection itemMatches = Regex.Matches(line, "(?:^|,)(?=[^\"]|(\")?)\"?(?(1)[^\"]*|[^,\"]*)\"?(?=,|$)"); // Csv regex format            
+            MatchCollection itemMatches = Regex.Matches(line, "(?:^|,)(?=[^\"]|(\")?)\"?(?(1)[^\"]*|[^,\"]*)\"?(?=,|$)"); // Csv regex format, no normal parethesses allowed    
             foreach (Match match in itemMatches)
             {
                 string itemValue = match.Value.StartsWith(",") ? match.Value.Remove(0, 1) : match.Value;
