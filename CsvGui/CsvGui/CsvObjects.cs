@@ -8,6 +8,7 @@ namespace Csv
     {
         public List<CsvRow> rows = null;
         public CsvRow headRow = null;
+        public string name = null;
         public CsvForm()
         {
             this.rows = new List<CsvRow>();
