@@ -94,28 +94,7 @@ namespace Csv
         public List<CsvItem> GetUniqueValueColumnItems(int columnIndex)
         {
             List<CsvItem> items = GetColumnItems(columnIndex);
-
-            for (int i = 0; i < items.Count; i++)
-            {
-                object iValue = items[i].GetValue();
-                if (iValue == null)
-                {
-                    items.RemoveAt(i);
-                    i--;
-                    continue;
-                }
-                for (int j = i + 1; j < items.Count; j++)
-                {
-                    object jValue = items[j].GetValue();
-                    if (iValue.Equals(jValue))
-                    {
-                        items.RemoveAt(j);
-                        j--;
-                    }
-                }
-            }
-
-            return items;
+            return CsvItem.GetUniqueItems(items);
         }
 
         public IEnumerator GetEnumerator()
@@ -241,6 +220,46 @@ namespace Csv
             item.index = index;
             item.parent = parent;
             return item;
+        }
+        public static int GetEmptyItemCount(List<CsvItem> items)
+        {
+            int count = 0;
+            foreach (CsvItem item in items)
+            {
+                if (item.IsNull())
+                {
+                    count++;
+                }
+                if (item is CsvString && (string)item.GetValue() == "")
+                {
+                    count++;
+                }
+            }
+            return count;
+        }
+        public static List<CsvItem> GetUniqueItems(List<CsvItem> items)
+        {
+            items = new List<CsvItem>(items);
+            for (int i = 0; i < items.Count; i++)
+            {
+                object iValue = items[i].GetValue();
+                if (iValue == null)
+                {
+                    items.RemoveAt(i);
+                    i--;
+                    continue;
+                }
+                for (int j = i + 1; j < items.Count; j++)
+                {
+                    object jValue = items[j].GetValue();
+                    if (iValue.Equals(jValue))
+                    {
+                        items.RemoveAt(j);
+                        j--;
+                    }
+                }
+            }
+            return items;
         }
 
         protected CsvRow parent = null;
