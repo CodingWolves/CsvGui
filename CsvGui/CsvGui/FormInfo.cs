@@ -59,13 +59,19 @@ namespace CsvGui
 
         private void RefreshColumnUniqueValues(int columnIndex)
         {
-            ColumnHeaderValuesPanel.Visible = true;
             ColumnHeaderValuesListView.Items.Clear();
-            List<CsvItem> uniqueValueItems = form.GetUniqueValueColumnItems(columnIndex);
+            List<CsvItem> columnItems = form.GetColumnItems(columnIndex);
+            List<CsvItem> uniqueValueItems = CsvItem.GetUniqueItems(columnItems);
             foreach (CsvItem item in uniqueValueItems)
             {
                 ColumnHeaderValuesListView.Items.Add(item.ToString());
             }
+            UniqueValuesLabel.Text = uniqueValueItems.Count.ToString() + Resources.NUMBER_UNIQUE_VALUES_STRING;
+
+            int nullCount = CsvItem.GetEmptyItemCount(columnItems);
+            NullValuesLabel.Text = nullCount.ToString() + Resources.NUMBER_NULL_VALUES_STRING;
+
+            ColumnHeaderValuesPanel.Visible = true;
         }
     }
 }
