@@ -28,10 +28,10 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.ListViewItem listViewItem7 = new System.Windows.Forms.ListViewItem(new string[] {
+            System.Windows.Forms.ListViewItem listViewItem1 = new System.Windows.Forms.ListViewItem(new string[] {
             "123"}, -1, System.Drawing.Color.Empty, System.Drawing.SystemColors.Window, null);
-            System.Windows.Forms.ListViewItem listViewItem8 = new System.Windows.Forms.ListViewItem("5643");
-            System.Windows.Forms.ListViewItem listViewItem9 = new System.Windows.Forms.ListViewItem("hgj");
+            System.Windows.Forms.ListViewItem listViewItem2 = new System.Windows.Forms.ListViewItem("5643");
+            System.Windows.Forms.ListViewItem listViewItem3 = new System.Windows.Forms.ListViewItem("hgj");
             this.label1 = new System.Windows.Forms.Label();
             this.FilenameTextBox = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
@@ -46,14 +46,22 @@
             this.ColumnIndexComboBox = new System.Windows.Forms.ComboBox();
             this.label6 = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
+            this.menuStrip1 = new System.Windows.Forms.MenuStrip();
+            this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.saveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
+            this.openToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
+            this.OpenGridViewButton = new System.Windows.Forms.Button();
             this.ColumnHeaderValuesPanel.SuspendLayout();
             this.panel2.SuspendLayout();
+            this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(12, 9);
+            this.label1.Location = new System.Drawing.Point(11, 39);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(54, 13);
             this.label1.TabIndex = 0;
@@ -62,7 +70,7 @@
             // FilenameTextBox
             // 
             this.FilenameTextBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 15F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(254)));
-            this.FilenameTextBox.Location = new System.Drawing.Point(12, 25);
+            this.FilenameTextBox.Location = new System.Drawing.Point(77, 27);
             this.FilenameTextBox.Multiline = true;
             this.FilenameTextBox.Name = "FilenameTextBox";
             this.FilenameTextBox.ReadOnly = true;
@@ -101,7 +109,7 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(12, 95);
+            this.label3.Location = new System.Drawing.Point(11, 98);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(60, 13);
             this.label3.TabIndex = 0;
@@ -109,7 +117,7 @@
             // 
             // RowCountTextBox
             // 
-            this.RowCountTextBox.Location = new System.Drawing.Point(72, 92);
+            this.RowCountTextBox.Location = new System.Drawing.Point(77, 95);
             this.RowCountTextBox.Name = "RowCountTextBox";
             this.RowCountTextBox.ReadOnly = true;
             this.RowCountTextBox.Size = new System.Drawing.Size(100, 20);
@@ -140,11 +148,11 @@
             // ColumnHeaderValuesListView
             // 
             this.ColumnHeaderValuesListView.HideSelection = false;
-            listViewItem7.StateImageIndex = 0;
+            listViewItem1.StateImageIndex = 0;
             this.ColumnHeaderValuesListView.Items.AddRange(new System.Windows.Forms.ListViewItem[] {
-            listViewItem7,
-            listViewItem8,
-            listViewItem9});
+            listViewItem1,
+            listViewItem2,
+            listViewItem3});
             this.ColumnHeaderValuesListView.Location = new System.Drawing.Point(8, 21);
             this.ColumnHeaderValuesListView.Name = "ColumnHeaderValuesListView";
             this.ColumnHeaderValuesListView.Size = new System.Drawing.Size(364, 96);
@@ -171,7 +179,7 @@
             this.panel2.Controls.Add(this.label5);
             this.panel2.Controls.Add(this.label2);
             this.panel2.Controls.Add(this.ColumnHeaderComboBox);
-            this.panel2.Location = new System.Drawing.Point(12, 118);
+            this.panel2.Location = new System.Drawing.Point(11, 121);
             this.panel2.Name = "panel2";
             this.panel2.Size = new System.Drawing.Size(390, 179);
             this.panel2.TabIndex = 5;
@@ -205,22 +213,81 @@
             this.label5.TabIndex = 2;
             this.label5.Text = "Name";
             // 
+            // menuStrip1
+            // 
+            this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.fileToolStripMenuItem});
+            this.menuStrip1.Location = new System.Drawing.Point(0, 0);
+            this.menuStrip1.Name = "menuStrip1";
+            this.menuStrip1.Size = new System.Drawing.Size(800, 24);
+            this.menuStrip1.TabIndex = 6;
+            this.menuStrip1.Text = "menuStrip1";
+            // 
+            // fileToolStripMenuItem
+            // 
+            this.fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.openToolStripMenuItem,
+            this.saveToolStripMenuItem});
+            this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
+            this.fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
+            this.fileToolStripMenuItem.Text = "File";
+            // 
+            // saveToolStripMenuItem
+            // 
+            this.saveToolStripMenuItem.Name = "saveToolStripMenuItem";
+            this.saveToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.saveToolStripMenuItem.Text = "Save";
+            this.saveToolStripMenuItem.Click += new System.EventHandler(this.saveToolStripMenuItem_Click);
+            // 
+            // saveFileDialog
+            // 
+            this.saveFileDialog.DefaultExt = "csv";
+            this.saveFileDialog.Filter = "Csv|*.csv;";
+            // 
+            // openToolStripMenuItem
+            // 
+            this.openToolStripMenuItem.Name = "openToolStripMenuItem";
+            this.openToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.openToolStripMenuItem.Text = "Open";
+            this.openToolStripMenuItem.Click += new System.EventHandler(this.openToolStripMenuItem_Click);
+            // 
+            // openFileDialog
+            // 
+            this.openFileDialog.DefaultExt = "csv";
+            this.openFileDialog.FileName = "form.csv";
+            this.openFileDialog.Filter = "Csv|*.csv;";
+            // 
+            // OpenGridViewButton
+            // 
+            this.OpenGridViewButton.Location = new System.Drawing.Point(11, 306);
+            this.OpenGridViewButton.Name = "OpenGridViewButton";
+            this.OpenGridViewButton.Size = new System.Drawing.Size(99, 23);
+            this.OpenGridViewButton.TabIndex = 7;
+            this.OpenGridViewButton.Text = "Open Grid View";
+            this.OpenGridViewButton.UseVisualStyleBackColor = true;
+            this.OpenGridViewButton.Click += new System.EventHandler(this.OpenGridViewButton_Click);
+            // 
             // FormInfo
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.OpenGridViewButton);
             this.Controls.Add(this.panel2);
             this.Controls.Add(this.RowCountTextBox);
             this.Controls.Add(this.FilenameTextBox);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.label1);
+            this.Controls.Add(this.menuStrip1);
+            this.MainMenuStrip = this.menuStrip1;
             this.Name = "FormInfo";
             this.Text = "FormInfo";
             this.ColumnHeaderValuesPanel.ResumeLayout(false);
             this.ColumnHeaderValuesPanel.PerformLayout();
             this.panel2.ResumeLayout(false);
             this.panel2.PerformLayout();
+            this.menuStrip1.ResumeLayout(false);
+            this.menuStrip1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -242,5 +309,12 @@
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Label NullValuesLabel;
+        private System.Windows.Forms.MenuStrip menuStrip1;
+        private System.Windows.Forms.ToolStripMenuItem fileToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem saveToolStripMenuItem;
+        private System.Windows.Forms.SaveFileDialog saveFileDialog;
+        private System.Windows.Forms.ToolStripMenuItem openToolStripMenuItem;
+        private System.Windows.Forms.OpenFileDialog openFileDialog;
+        private System.Windows.Forms.Button OpenGridViewButton;
     }
 }

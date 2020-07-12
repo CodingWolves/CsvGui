@@ -30,6 +30,7 @@ namespace Csv
             DateTime startTime = DateTime.Now;
             CsvForm form = new CsvForm();
             form.name = Path.GetFileName(filePath);
+            form.filePath = filePath;
 
             StreamReader stream = new StreamReader(filePath);
             int rowCount = 0;

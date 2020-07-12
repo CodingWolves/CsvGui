@@ -5,12 +5,13 @@ using System.IO;
 
 namespace Csv
 {
-    public class CsvForm : IEnumerable
+    public class CsvForm : IEnumerable, ICloneable
     {
         public List<CsvRow> rows = null;
         public CsvRow headRow = null;
         public bool editable = true;
         public string name = null;
+        public string filePath = null;
         public CsvForm()
         {
             this.rows = new List<CsvRow>();
@@ -18,7 +19,14 @@ namespace Csv
         }
         public CsvForm(CsvForm form) : this()
         {
-            this.rows.AddRange(form.rows);
+            foreach (CsvRow row in form.rows)
+            {
+                this.rows.Add((CsvRow)row.Clone());
+            }
+            this.headRow = (CsvRow)form.headRow.Clone();
+            this.editable = form.editable;
+            this.name = form.name;
+            this.filePath = form.filePath;           
         }
 
         public void AddRow(CsvRow row)
@@ -56,10 +64,14 @@ namespace Csv
         }
         private void ExpandHeadRow(CsvRow row)
         {
-            while (row.items.Count > headRow.items.Count)
+            foreach (CsvItem item in row)
             {
-                headRow.AddItem(CsvItem.CreateNullCsvItem(headRow, headRow.items[headRow.items.Count-1].index+1));
+                if (this.headRow.HasItemIndex(item.index) == false)
+                {
+                    headRow.AddItem(CsvItem.CreateNullCsvItem(headRow, item.index));
+                }
             }
+            headRow.SortItemsIndexes();
         }
 
         public CsvRow GetRow(int rowIndex)
@@ -110,10 +122,16 @@ namespace Csv
                 row.Save(stream);
             }
             stream.Close();
+            this.filePath = filePath;
+        }
+
+        public object Clone()
+        {
+            return new CsvForm(this);
         }
     }
 
-    public class CsvRow : IEnumerable
+    public class CsvRow : IEnumerable, ICloneable
     {
         public List<CsvItem> items = null;
         public int index = -1;
@@ -200,10 +218,32 @@ namespace Csv
             }
             stream.WriteLine();
         }
+
+        public object Clone()
+        {
+            return new CsvRow(this);
+        }
+
+        internal bool HasItemIndex(int index)
+        {
+            foreach (CsvItem item in this)
+            {
+                if (item.index == index)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        internal void SortItemsIndexes()
+        {
+            this.items.Sort();
+        }
     }
 
 
-    public abstract class CsvItem : ICloneable
+    public abstract class CsvItem : ICloneable, IComparable
     {
         public static readonly CsvItem Null = new CsvItemNull();
         public static CsvItem CreateCsvItem(object value, CsvRow parent, int index)
@@ -281,6 +321,11 @@ namespace Csv
         public abstract object Clone();
         public override abstract string ToString();
         public abstract string ToSaveableString();
+
+        public int CompareTo(object obj)
+        {
+            return this.index - ((CsvItem)obj).index;
+        }
 
         private class CsvItemNull : CsvItem
         {
