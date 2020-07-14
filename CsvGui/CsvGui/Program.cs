@@ -21,7 +21,7 @@ namespace CsvGui
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
-            ApplicationQueue.GetInstance().AddFormQueue(new FormInfo());
+            ApplicationQueue.InstanceAddFormQueue(new FormLoader());
 
             ApplicationQueue.RunApplicationQueue();
         }

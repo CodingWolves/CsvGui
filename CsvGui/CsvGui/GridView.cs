@@ -14,7 +14,6 @@ namespace CsvGui
     public partial class GridView : Form , ICsvFormable
     {
         private CsvForm form = null;
-        private bool editEnabled = false;
         public GridView()
         {
             InitializeComponent();
@@ -29,8 +28,11 @@ namespace CsvGui
             DataGridViewCell cell = dataGridView[e.ColumnIndex, e.RowIndex];
             if (cell.Value is string)
             {
-                itemEdit.UpdateValue(cell.Value);
-                cell.Value = itemEdit; // recursive method by calling cell.Value to set to CsvItem
+                if (cell.Value != itemEdit.GetValue())
+                {
+                    itemEdit.UpdateValue(cell.Value);
+                    cell.Value = itemEdit; // recursive method by calling cell.Value to set to CsvItem
+                }
             }
             //RefreshDataGrid();
         }
@@ -39,14 +41,29 @@ namespace CsvGui
         {
             dataGridView.Rows.Clear();
             dataGridView.Columns.Clear();
+            Dictionary<int, int> columnToGridIndex = new Dictionary<int, int>();
+            int gridIndexCount = 0;
             foreach (CsvItem item in form.headRow)
             {
                 dataGridView.Columns.Add(item.index.ToString(), item.ToString());
+                columnToGridIndex.Add(item.index.GetColumnIndex(), gridIndexCount++);
             }
-            foreach (CsvRow row in form.rows)
+            foreach (CsvRow row in form)
             {
-                object[] rowValues = row.items.ToArray();
-                dataGridView.Rows.Add(rowValues);
+                DataGridViewRow gridRow = new DataGridViewRow();
+                int ColumnIndex = 0;
+                List<object> objs = new List<object>();
+                foreach(CsvItem item in row)
+                {
+                    while (columnToGridIndex[item.index.GetColumnIndex()] > ColumnIndex)
+                    {
+                        objs.Add(null);
+                        ColumnIndex++;
+                    }
+                    objs.Add(item);
+                    ColumnIndex++;
+                }
+                dataGridView.Rows.Add(objs.ToArray());
             }
         }
 
@@ -59,10 +76,11 @@ namespace CsvGui
                     CsvItem item = (CsvItem)e.Cell.Value;
                     StripCellPositionLabel.Text = string.Format("row {0}, column {1}", item.GetParent().index, item.index);
                 }
-                else
+                else if (e.Cell.Value is CsvItem)
                 {
-
+                    
                 }
+                itemEdit = (CsvItem)e.Cell.Value;
             }
         }
 

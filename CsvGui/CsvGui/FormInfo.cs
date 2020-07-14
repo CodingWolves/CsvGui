@@ -10,6 +10,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using static System.Windows.Forms.ListView;
 
 namespace CsvGui
 {
@@ -24,7 +25,7 @@ namespace CsvGui
         private void RefreshInfo()
         {
             FilenameTextBox.Text = form.name;
-            RowCountTextBox.Text = form.rows.Count.ToString();
+            RowCountTextBox.Text = form.RowCount.ToString();
             ColumnHeaderComboBox.Items.Clear();
             ColumnIndexComboBox.Items.Clear();
             if (form.headRow != null)
@@ -37,21 +38,46 @@ namespace CsvGui
             }
         }
 
+        private List<CsvItem> uniqueValueItems;
+        private const int ColumnValuesLoadLimit = 50;
         private void RefreshColumnUniqueValues(int columnIndex)
         {
             ColumnHeaderValuesListView.Items.Clear();
-            List<CsvItem> columnItems = form.GetColumnItems(columnIndex);
-            List<CsvItem> uniqueValueItems = CsvItem.GetUniqueItems(columnItems);
+            CsvColumn column = form.GetColumn(columnIndex);
+            uniqueValueItems = CsvItem.GetUniqueItems(column);
+            int count = 0;
             foreach (CsvItem item in uniqueValueItems)
             {
-                ColumnHeaderValuesListView.Items.Add(item.ToString());
+                count++;
+                ListViewItem viewItem = new ListViewItem(item.ToString());
+                viewItem.Tag = item;
+                ColumnHeaderValuesListView.Items.Add(viewItem);
+                if (count >= ColumnValuesLoadLimit)
+                {
+                    break;
+                }
             }
+            ColumnValuesViewMoreButton.Visible = count >= ColumnValuesLoadLimit;
             UniqueValuesLabel.Text = uniqueValueItems.Count.ToString() + Resources.NUMBER_UNIQUE_VALUES_STRING;
-
-            int nullCount = form.rows.Count - columnItems.Count;
+            int nullCount = form.RowCount - column.items.Count;
             NullValuesLabel.Text = nullCount.ToString() + Resources.NUMBER_NULL_VALUES_STRING;
-
             ColumnHeaderValuesPanel.Visible = true;
+        }
+
+        private void ColumnValuesViewMoreButton_Click(object sender, EventArgs e)
+        {
+            int count = 0;
+            for (int i= ColumnHeaderValuesListView.Items.Count+1;i< uniqueValueItems.Count;i++) 
+            {
+                CsvItem item = uniqueValueItems[i];
+                count++;
+                ColumnHeaderValuesListView.Items.Add(item.ToString());
+                if (count >= ColumnValuesLoadLimit)
+                {
+                    break;
+                }
+            }
+            ColumnValuesViewMoreButton.Visible = count >= ColumnValuesLoadLimit;
         }
 
         #region Form Interactions
@@ -59,7 +85,7 @@ namespace CsvGui
         private void ColumnHeaderComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
             CsvItem itemColumnHeader = (CsvItem)ColumnHeaderComboBox.SelectedItem;
-            if (ColumnIndexComboBox.SelectedItem is null || itemColumnHeader.index != (int)ColumnIndexComboBox.SelectedItem)
+            if (ColumnIndexComboBox.SelectedItem is null || itemColumnHeader.index != (CsvIndex)ColumnIndexComboBox.SelectedItem)
             {
                 ColumnIndexComboBox.SelectedItem = itemColumnHeader.index;
             }
@@ -67,12 +93,12 @@ namespace CsvGui
 
         private void ColumnIndexComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
-            int columnIndex = (int)ColumnIndexComboBox.SelectedItem;
-            if (ColumnHeaderComboBox.SelectedItem is null || columnIndex != ((CsvItem)ColumnHeaderComboBox.SelectedItem).index)
+            CsvIndex index = (CsvIndex)ColumnIndexComboBox.SelectedItem;
+            if (ColumnHeaderComboBox.SelectedItem is null || index != ((CsvItem)ColumnHeaderComboBox.SelectedItem).index)
             {
-                ColumnHeaderComboBox.SelectedItem = form.headRow.GetItem(columnIndex);
+                ColumnHeaderComboBox.SelectedItem = form.headRow.GetItem(index);
             }
-            RefreshColumnUniqueValues(columnIndex);
+            RefreshColumnUniqueValues(index.GetColumnIndex());
         }
 
         private void saveToolStripMenuItem_Click(object sender, EventArgs e)
@@ -90,17 +116,83 @@ namespace CsvGui
 
         private void openToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (openFileDialog.ShowDialog() == DialogResult.OK)
-            {
-                string filePath = openFileDialog.FileName;
-                CsvForm newForm = Csv.Csv.LoadCsv(filePath, false);
-                ApplicationQueue.GetInstance().AddFormQueue(LoadingScreen.ConstructForm<FormInfo>(newForm));
-            }
+            ApplicationQueue.InstanceAddFormQueue(new FormLoader());
         }
 
         private void OpenGridViewButton_Click(object sender, EventArgs e)
         {
-            ApplicationQueue.GetInstance().AddFormQueue(LoadingScreen.ConstructForm<GridView>(this.form));
+            if (form != null)
+            {
+                ApplicationQueue.InstanceAddFormQueue(LoadingScreen.ConstructForm<GridView>(this.form));
+            }
+        }
+
+        private void ColumnValuesOpenSelectedButton_Click(object sender, EventArgs e)
+        {
+            int columnIndex = ((CsvIndex)ColumnIndexComboBox.SelectedItem).GetColumnIndex();
+            List<CsvItem> items = new List<CsvItem>();
+            SelectedListViewItemCollection collection = ColumnHeaderValuesListView.SelectedItems;
+            foreach (ListViewItem viewItem in collection)
+            {
+                items.Add(((CsvItem)viewItem.Tag));
+            }
+
+            CsvForm queryForm = new CsvForm();
+            queryForm.name = form.name + "_SelectedRowsItemValuesByColumn"+ columnIndex;
+            foreach (CsvItem item in items)
+            {
+                queryForm.Append(CsvQuery.GetRowsContainsValue(form, item, false));
+            }
+        }
+
+        #endregion
+
+
+        #region Query Interactions
+
+        private void OperationComboBox1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            switch ((string)OperationComboBox1.SelectedItem)
+            {
+                case "Select":
+                case "Remove": break;
+            }
+        }
+
+        private void OperationOnComboBox1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            OperationItemComboBox1.Items.Clear();
+            switch ((string)OperationOnComboBox1.SelectedItem)
+            {
+                case "Columns":
+                    {
+                        foreach (CsvItem item in form.headRow)
+                        {
+                            OperationItemComboBox1.Items.Add(item.index);
+                        }
+                    }
+                    break;
+                case "Rows":
+                    {
+                        foreach (CsvIndex index in form.GetRowIndexes())
+                        {
+                            OperationItemComboBox1.Items.Add(index);
+                        }
+                    }
+                    break;
+                case "All":
+                    {
+                        foreach (CsvItem item in form.headRow)
+                        {
+                            OperationItemComboBox1.Items.Add(item.index);
+                        }
+                        foreach (CsvIndex index in form.GetRowIndexes())
+                        {
+                            OperationItemComboBox1.Items.Add(index);
+                        }
+                    }
+                    break;
+            }
         }
 
         #endregion

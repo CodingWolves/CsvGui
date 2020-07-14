@@ -18,7 +18,6 @@ namespace CsvGui
         }
 
         private Queue<Form> formQueue = new Queue<Form>();
-        private bool running = false;
         private List<Form> openForms = new List<Form>();
         public void AddFormQueue(Form form)
         {
@@ -32,6 +31,7 @@ namespace CsvGui
             if (sender is Form)
             {
                 Form form = (Form)sender;
+                form.Dispose();
                 lock (this)
                 {
                     this.openForms.Remove(form);
@@ -46,7 +46,6 @@ namespace CsvGui
 
         public static void RunApplicationQueue()
         {
-            instance.running = true;
             bool stilRunning = true;
             while (stilRunning)
             {
@@ -55,7 +54,7 @@ namespace CsvGui
                     if (instance.formQueue.Count > 0)
                     {
                         Form form = instance.formQueue.Dequeue();
-                        form.FormClosed += Form_FormClosed;
+                        form.FormClosed += FormClosed;
                         Thread th = new Thread(Run);
                         th.SetApartmentState(ApartmentState.STA);
                         th.Start(form);
@@ -70,14 +69,13 @@ namespace CsvGui
             }
         }
 
-        private static void Form_FormClosed(object sender, FormClosedEventArgs e)
+        private static void FormClosed(object sender, FormClosedEventArgs e)
         {
             lock (instance)
             {
                 instance.RemoveOpenForm(sender);
             }
         }
-
         private static void Run(object form)
         {
             Application.Run((Form)form);

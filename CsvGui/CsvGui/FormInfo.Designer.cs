@@ -39,6 +39,7 @@
             this.label3 = new System.Windows.Forms.Label();
             this.RowCountTextBox = new System.Windows.Forms.TextBox();
             this.ColumnHeaderValuesPanel = new System.Windows.Forms.Panel();
+            this.ColumnValuesViewMoreButton = new System.Windows.Forms.Button();
             this.NullValuesLabel = new System.Windows.Forms.Label();
             this.ColumnHeaderValuesListView = new System.Windows.Forms.ListView();
             this.UniqueValuesLabel = new System.Windows.Forms.Label();
@@ -48,14 +49,25 @@
             this.label5 = new System.Windows.Forms.Label();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.openToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.saveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
-            this.openToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.OpenGridViewButton = new System.Windows.Forms.Button();
+            this.OperationComboBox1 = new System.Windows.Forms.ComboBox();
+            this.panel1 = new System.Windows.Forms.Panel();
+            this.comboBox6 = new System.Windows.Forms.ComboBox();
+            this.label4 = new System.Windows.Forms.Label();
+            this.comboBox3 = new System.Windows.Forms.ComboBox();
+            this.comboBox5 = new System.Windows.Forms.ComboBox();
+            this.comboBox4 = new System.Windows.Forms.ComboBox();
+            this.OperationItemComboBox1 = new System.Windows.Forms.ComboBox();
+            this.OperationOnComboBox1 = new System.Windows.Forms.ComboBox();
+            this.ColumnValuesOpenSelectedButton = new System.Windows.Forms.Button();
             this.ColumnHeaderValuesPanel.SuspendLayout();
             this.panel2.SuspendLayout();
             this.menuStrip1.SuspendLayout();
+            this.panel1.SuspendLayout();
             this.SuspendLayout();
             // 
             // label1
@@ -126,15 +138,28 @@
             // ColumnHeaderValuesPanel
             // 
             this.ColumnHeaderValuesPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.ColumnHeaderValuesPanel.Controls.Add(this.ColumnValuesOpenSelectedButton);
+            this.ColumnHeaderValuesPanel.Controls.Add(this.ColumnValuesViewMoreButton);
             this.ColumnHeaderValuesPanel.Controls.Add(this.NullValuesLabel);
             this.ColumnHeaderValuesPanel.Controls.Add(this.ColumnHeaderValuesListView);
             this.ColumnHeaderValuesPanel.Controls.Add(this.UniqueValuesLabel);
             this.ColumnHeaderValuesPanel.Location = new System.Drawing.Point(3, 47);
             this.ColumnHeaderValuesPanel.Name = "ColumnHeaderValuesPanel";
             this.ColumnHeaderValuesPanel.Padding = new System.Windows.Forms.Padding(5);
-            this.ColumnHeaderValuesPanel.Size = new System.Drawing.Size(380, 125);
+            this.ColumnHeaderValuesPanel.Size = new System.Drawing.Size(380, 168);
             this.ColumnHeaderValuesPanel.TabIndex = 4;
             this.ColumnHeaderValuesPanel.Visible = false;
+            // 
+            // ColumnValuesViewMoreButton
+            // 
+            this.ColumnValuesViewMoreButton.Location = new System.Drawing.Point(297, 123);
+            this.ColumnValuesViewMoreButton.Name = "ColumnValuesViewMoreButton";
+            this.ColumnValuesViewMoreButton.Size = new System.Drawing.Size(75, 24);
+            this.ColumnValuesViewMoreButton.TabIndex = 3;
+            this.ColumnValuesViewMoreButton.Text = "View More";
+            this.ColumnValuesViewMoreButton.UseVisualStyleBackColor = true;
+            this.ColumnValuesViewMoreButton.Visible = false;
+            this.ColumnValuesViewMoreButton.Click += new System.EventHandler(this.ColumnValuesViewMoreButton_Click);
             // 
             // NullValuesLabel
             // 
@@ -181,7 +206,7 @@
             this.panel2.Controls.Add(this.ColumnHeaderComboBox);
             this.panel2.Location = new System.Drawing.Point(11, 121);
             this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(390, 179);
+            this.panel2.Size = new System.Drawing.Size(390, 267);
             this.panel2.TabIndex = 5;
             // 
             // ColumnIndexComboBox
@@ -232,6 +257,13 @@
             this.fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
             this.fileToolStripMenuItem.Text = "File";
             // 
+            // openToolStripMenuItem
+            // 
+            this.openToolStripMenuItem.Name = "openToolStripMenuItem";
+            this.openToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.openToolStripMenuItem.Text = "Open";
+            this.openToolStripMenuItem.Click += new System.EventHandler(this.openToolStripMenuItem_Click);
+            // 
             // saveToolStripMenuItem
             // 
             this.saveToolStripMenuItem.Name = "saveToolStripMenuItem";
@@ -244,13 +276,6 @@
             this.saveFileDialog.DefaultExt = "csv";
             this.saveFileDialog.Filter = "Csv|*.csv;";
             // 
-            // openToolStripMenuItem
-            // 
-            this.openToolStripMenuItem.Name = "openToolStripMenuItem";
-            this.openToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.openToolStripMenuItem.Text = "Open";
-            this.openToolStripMenuItem.Click += new System.EventHandler(this.openToolStripMenuItem_Click);
-            // 
             // openFileDialog
             // 
             this.openFileDialog.DefaultExt = "csv";
@@ -259,7 +284,7 @@
             // 
             // OpenGridViewButton
             // 
-            this.OpenGridViewButton.Location = new System.Drawing.Point(11, 306);
+            this.OpenGridViewButton.Location = new System.Drawing.Point(407, 136);
             this.OpenGridViewButton.Name = "OpenGridViewButton";
             this.OpenGridViewButton.Size = new System.Drawing.Size(99, 23);
             this.OpenGridViewButton.TabIndex = 7;
@@ -267,11 +292,134 @@
             this.OpenGridViewButton.UseVisualStyleBackColor = true;
             this.OpenGridViewButton.Click += new System.EventHandler(this.OpenGridViewButton_Click);
             // 
+            // OperationComboBox1
+            // 
+            this.OperationComboBox1.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.OperationComboBox1.FormattingEnabled = true;
+            this.OperationComboBox1.Items.AddRange(new object[] {
+            "Select",
+            "Remove"});
+            this.OperationComboBox1.Location = new System.Drawing.Point(0, 16);
+            this.OperationComboBox1.Name = "OperationComboBox1";
+            this.OperationComboBox1.Size = new System.Drawing.Size(72, 21);
+            this.OperationComboBox1.TabIndex = 8;
+            this.OperationComboBox1.SelectedIndexChanged += new System.EventHandler(this.OperationComboBox1_SelectedIndexChanged);
+            // 
+            // panel1
+            // 
+            this.panel1.Controls.Add(this.comboBox6);
+            this.panel1.Controls.Add(this.label4);
+            this.panel1.Controls.Add(this.comboBox3);
+            this.panel1.Controls.Add(this.comboBox5);
+            this.panel1.Controls.Add(this.comboBox4);
+            this.panel1.Controls.Add(this.OperationItemComboBox1);
+            this.panel1.Controls.Add(this.OperationOnComboBox1);
+            this.panel1.Controls.Add(this.OperationComboBox1);
+            this.panel1.Location = new System.Drawing.Point(407, 27);
+            this.panel1.Name = "panel1";
+            this.panel1.Size = new System.Drawing.Size(381, 100);
+            this.panel1.TabIndex = 9;
+            // 
+            // comboBox6
+            // 
+            this.comboBox6.FormattingEnabled = true;
+            this.comboBox6.Location = new System.Drawing.Point(288, 43);
+            this.comboBox6.Name = "comboBox6";
+            this.comboBox6.Size = new System.Drawing.Size(79, 21);
+            this.comboBox6.TabIndex = 10;
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(3, 0);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(53, 13);
+            this.label4.TabIndex = 9;
+            this.label4.Text = "Operation";
+            // 
+            // comboBox3
+            // 
+            this.comboBox3.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboBox3.FormattingEnabled = true;
+            this.comboBox3.Items.AddRange(new object[] {
+            "Where"});
+            this.comboBox3.Location = new System.Drawing.Point(40, 43);
+            this.comboBox3.Name = "comboBox3";
+            this.comboBox3.Size = new System.Drawing.Size(72, 21);
+            this.comboBox3.TabIndex = 8;
+            // 
+            // comboBox5
+            // 
+            this.comboBox5.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboBox5.FormattingEnabled = true;
+            this.comboBox5.Items.AddRange(new object[] {
+            "=",
+            ">",
+            ">=",
+            "<",
+            "<=",
+            "!=",
+            "contain",
+            "does not contain"});
+            this.comboBox5.Location = new System.Drawing.Point(252, 43);
+            this.comboBox5.Name = "comboBox5";
+            this.comboBox5.Size = new System.Drawing.Size(30, 21);
+            this.comboBox5.TabIndex = 8;
+            // 
+            // comboBox4
+            // 
+            this.comboBox4.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboBox4.FormattingEnabled = true;
+            this.comboBox4.Items.AddRange(new object[] {
+            "Value",
+            "All Column Values",
+            "All Row Values"});
+            this.comboBox4.Location = new System.Drawing.Point(118, 43);
+            this.comboBox4.Name = "comboBox4";
+            this.comboBox4.Size = new System.Drawing.Size(128, 21);
+            this.comboBox4.TabIndex = 8;
+            // 
+            // OperationItemComboBox1
+            // 
+            this.OperationItemComboBox1.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.OperationItemComboBox1.FormattingEnabled = true;
+            this.OperationItemComboBox1.Items.AddRange(new object[] {
+            "Row or Columns Options"});
+            this.OperationItemComboBox1.Location = new System.Drawing.Point(156, 16);
+            this.OperationItemComboBox1.Name = "OperationItemComboBox1";
+            this.OperationItemComboBox1.Size = new System.Drawing.Size(90, 21);
+            this.OperationItemComboBox1.TabIndex = 8;
+            // 
+            // OperationOnComboBox1
+            // 
+            this.OperationOnComboBox1.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.OperationOnComboBox1.FormattingEnabled = true;
+            this.OperationOnComboBox1.Items.AddRange(new object[] {
+            "Columns",
+            "Rows",
+            "All"});
+            this.OperationOnComboBox1.Location = new System.Drawing.Point(78, 16);
+            this.OperationOnComboBox1.Name = "OperationOnComboBox1";
+            this.OperationOnComboBox1.Size = new System.Drawing.Size(72, 21);
+            this.OperationOnComboBox1.TabIndex = 8;
+            this.OperationOnComboBox1.SelectedIndexChanged += new System.EventHandler(this.OperationOnComboBox1_SelectedIndexChanged);
+            // 
+            // ColumnValuesOpenSelectedButton
+            // 
+            this.ColumnValuesOpenSelectedButton.Location = new System.Drawing.Point(8, 135);
+            this.ColumnValuesOpenSelectedButton.Name = "ColumnValuesOpenSelectedButton";
+            this.ColumnValuesOpenSelectedButton.Size = new System.Drawing.Size(128, 23);
+            this.ColumnValuesOpenSelectedButton.TabIndex = 4;
+            this.ColumnValuesOpenSelectedButton.Text = "Open Selected Values";
+            this.ColumnValuesOpenSelectedButton.UseVisualStyleBackColor = true;
+            this.ColumnValuesOpenSelectedButton.Click += new System.EventHandler(this.ColumnValuesOpenSelectedButton_Click);
+            // 
             // FormInfo
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.panel1);
             this.Controls.Add(this.OpenGridViewButton);
             this.Controls.Add(this.panel2);
             this.Controls.Add(this.RowCountTextBox);
@@ -288,6 +436,8 @@
             this.panel2.PerformLayout();
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
+            this.panel1.ResumeLayout(false);
+            this.panel1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -316,5 +466,16 @@
         private System.Windows.Forms.ToolStripMenuItem openToolStripMenuItem;
         private System.Windows.Forms.OpenFileDialog openFileDialog;
         private System.Windows.Forms.Button OpenGridViewButton;
+        private System.Windows.Forms.ComboBox OperationComboBox1;
+        private System.Windows.Forms.Panel panel1;
+        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.ComboBox comboBox3;
+        private System.Windows.Forms.ComboBox comboBox5;
+        private System.Windows.Forms.ComboBox comboBox4;
+        private System.Windows.Forms.ComboBox OperationOnComboBox1;
+        private System.Windows.Forms.ComboBox OperationItemComboBox1;
+        private System.Windows.Forms.ComboBox comboBox6;
+        private System.Windows.Forms.Button ColumnValuesViewMoreButton;
+        private System.Windows.Forms.Button ColumnValuesOpenSelectedButton;
     }
 }

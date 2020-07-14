@@ -19,7 +19,7 @@ namespace Csv
         public static CsvForm LoadCsv(string filePath, bool hasHead, int rowOffset, int rows)
         {
             return LoadCsv(filePath, hasHead, rowOffset, rows, TimeSpan.MaxValue);
-        }    
+        }
         public static CsvForm LoadCsv(string filePath, bool hasHead, TimeSpan readTimeSpan)
         {
             return LoadCsv(filePath, hasHead, 0, int.MaxValue, readTimeSpan);
@@ -36,7 +36,8 @@ namespace Csv
             int rowCount = 0;
             if (hasHead && !stream.EndOfStream)
             {
-                form.SetHeadRow(ReadRow(stream, ++rowCount));
+                form.SetHeadRow(ReadRow(stream, -1));
+                rowCount++;
                 rowOffset--;
             }
             while (rowOffset > 0 && !stream.EndOfStream) // skip lines by rowOffset
@@ -49,6 +50,7 @@ namespace Csv
             {
                 form.AddRow(ReadRow(stream, ++rowCount));
             }
+            form.ExpandHeadRow();
             stream.Close();
             return form;
         }
@@ -60,7 +62,7 @@ namespace Csv
             int itemCount = 0;
             while (line.StartsWith(",")) // regex has a problem with empty items at start
             {
-                row.AddItem(CsvItem.CreateCsvItem(null,row,++itemCount));
+                itemCount++;
                 line = line.Remove(0, 1);
             }
             MatchCollection itemMatches = Regex.Matches(line, "(?:^|,)(?=[^\"]|(\")?)\"?(?(1)[^\"]*|[^,\"]*)\"?(?=,|$)"); // Csv regex format, no normal parethesses allowed    
@@ -71,7 +73,14 @@ namespace Csv
                 {
                     itemValue = itemValue.Substring(1, itemValue.Length - 2);
                 }
-                row.AddItem(CsvItem.CreateCsvItem(itemValue, row, ++itemCount));
+                if (string.IsNullOrEmpty(itemValue) == false && string.IsNullOrWhiteSpace(itemValue) == false)
+                {
+                    row.AddItem(CsvItem.CreateCsvItem(itemValue, row, new CsvIndex(rowIndex, ++itemCount)));
+                }
+                else
+                {
+                    itemCount++;
+                }
             }
             return row;
         }

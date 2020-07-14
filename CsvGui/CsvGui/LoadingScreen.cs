@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -16,6 +17,25 @@ namespace CsvGui
 {
     public partial class LoadingScreen : Form
     {
+        public static Class ConstructForm<Class>(string formPath, bool hasHead) where Class : Csv.ICsvFormable, new()
+        {
+            return ConstructForm<Class>(formPath,hasHead, Path.GetFileName(formPath));
+        }
+        public static Class ConstructForm<Class>(string formPath,bool hasHead, string loadingName) where Class : Csv.ICsvFormable, new()
+        {
+            LoadingScreen loadingScreen = new LoadingScreen(loadingName);
+
+            Thread thread = new Thread(OpenLoadingScreen);
+            thread.Start(loadingScreen);
+
+            CsvForm formArg = Csv.Csv.LoadCsv(formPath, hasHead);
+            Class classForm = new Class();
+            classForm.SetForm(formArg);
+
+            loadingScreen.Stop();
+            return classForm;
+        }
+
         public static Class ConstructForm<Class>(CsvForm formArg) where Class : Csv.ICsvFormable, new()
         {
             return ConstructForm<Class>(formArg, formArg.name);
@@ -67,6 +87,5 @@ namespace CsvGui
                 this.isLoading = false;
             }
         }
-
     }
 }

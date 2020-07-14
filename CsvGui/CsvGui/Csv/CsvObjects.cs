@@ -1,157 +1,33 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 
 namespace Csv
 {
-    public class CsvForm : IEnumerable, ICloneable
+    public class CsvItemCollction:IEnumerable, ICloneable, IComparable<CsvItemCollction>
     {
-        public List<CsvRow> rows = null;
-        public CsvRow headRow = null;
-        public bool editable = true;
-        public string name = null;
-        public string filePath = null;
-        public CsvForm()
+        public Dictionary<CsvIndex,CsvItem> items = null;
+        public CsvIndex index = new CsvIndex();
+        public CsvItemCollction()
         {
-            this.rows = new List<CsvRow>();
-            this.headRow = new CsvRow();
+            this.items = new Dictionary<CsvIndex, CsvItem>();
         }
-        public CsvForm(CsvForm form) : this()
+        public CsvItemCollction(CsvItemCollction collection) : this()
         {
-            foreach (CsvRow row in form.rows)
+            this.index = (CsvIndex)collection.index.Clone();
+            foreach (CsvItem item in collection)
             {
-                this.rows.Add((CsvRow)row.Clone());
-            }
-            this.headRow = (CsvRow)form.headRow.Clone();
-            this.editable = form.editable;
-            this.name = form.name;
-            this.filePath = form.filePath;           
-        }
-
-        public void AddRow(CsvRow row)
-        {
-            rows.Add(row);
-            this.ExpandHeadRow(row);
-        }
-        public void SetHeadRow(CsvRow headRow)
-        {
-            this.headRow = headRow;
-        }
-
-        public CsvItem this[int rowIndex, int columnIndex]
-        {
-            get
-            {
-                return this.GetRow(rowIndex).GetItem(columnIndex);
-            }
-        }    
-        public CsvRow this[int rowIndex]
-        {
-            get
-            {
-                return this.GetRow(rowIndex);
+                this.items.Add(item.index,item.Clone(this));
             }
         }
-
-        public void UpdateValue(int rowIndex, int columnIndex, object value)
-        {
-            while (rowIndex >= this.rows.Count)
-            {
-                this.rows.Add(new CsvRow());
-            }
-            this.rows[rowIndex].UpdateValue(columnIndex, value);
-        }
-        private void ExpandHeadRow(CsvRow row)
-        {
-            foreach (CsvItem item in row)
-            {
-                if (this.headRow.HasItemIndex(item.index) == false)
-                {
-                    headRow.AddItem(CsvItem.CreateNullCsvItem(headRow, item.index));
-                }
-            }
-            headRow.SortItemsIndexes();
-        }
-
-        public CsvRow GetRow(int rowIndex)
-        {
-            foreach (CsvRow row in this.rows)
-            {
-                if (row.index == rowIndex)
-                {
-                    return row;
-                }
-            }
-            return null;
-        }
-
-        public List<CsvItem> GetColumnItems(int columnIndex)
-        {
-            List<CsvItem> items = new List<CsvItem>();
-            foreach (CsvRow row in this.rows)
-            {
-                if (columnIndex <= row.items.Count)
-                {
-                    items.Add((CsvItem)row.GetItem(columnIndex).Clone());
-                }
-                else
-                {
-                    items.Add(CsvItem.CreateNullCsvItem(row, row.items.Count));
-                }
-            }
-            return items;
-        }
-
-        public List<CsvItem> GetUniqueValueColumnItems(int columnIndex)
-        {
-            List<CsvItem> items = GetColumnItems(columnIndex);
-            return CsvItem.GetUniqueItems(items);
-        }
-
-        public IEnumerator GetEnumerator()
-        {
-            return this.rows.GetEnumerator();
-        }
-
-        public void Save(string filePath)
-        {
-            StreamWriter stream = new StreamWriter(filePath, false);
-            foreach(CsvRow row in this.rows)
-            {
-                row.Save(stream);
-            }
-            stream.Close();
-            this.filePath = filePath;
-        }
-
-        public object Clone()
-        {
-            return new CsvForm(this);
-        }
-    }
-
-    public class CsvRow : IEnumerable, ICloneable
-    {
-        public List<CsvItem> items = null;
-        public int index = -1;
-        public CsvRow()
-        {
-            this.items = new List<CsvItem>();
-        }
-        public CsvRow(CsvRow row) : this()
-        {
-            foreach (CsvItem item in row.items)
-            {
-                this.items.Add((CsvItem)item.Clone());
-            }
-        }
-        public CsvRow(int rowIndex):this()
+        public CsvItemCollction(CsvIndex rowIndex) : this()
         {
             this.index = rowIndex;
         }
 
-        public CsvItem this[int index]
+        public CsvItem this[CsvIndex index]
         {
             get
             {
@@ -160,7 +36,7 @@ namespace Csv
         }
         public void AddItem(CsvItem item)
         {
-            this.items.Add(item);
+            this.items.Add(item.index, item);
         }
 
         public List<Object> GetAllValues()
@@ -173,28 +49,25 @@ namespace Csv
             return objs;
         }
 
-        public void UpdateValue(int itemIndex, object value)
+        public void UpdateValue(CsvIndex itemIndex, object value)
         {
-            while (itemIndex >= this.items.Count)
+            CsvItem item = GetItem(itemIndex);
+            if (item!=null && value.GetType() == item.GetValueType())
             {
-                this.items.Add(CsvItem.CreateNullCsvItem(this, this.items.Count));
-            }
-            if (value.GetType() == this.items[itemIndex].GetValueType())
-            {
-                this.items[itemIndex].UpdateValue(value);
+                item.UpdateValue(value);
             }
             else
             {
-                this.items[itemIndex] = CsvItem.CreateCsvItem(value, this, this.items[itemIndex].index);
+                SetItem(itemIndex, CsvItem.CreateCsvItem(value, this, itemIndex));
             }
-                
+
         }
 
-        public CsvItem GetItem(int itemIndex)
+        public CsvItem GetItem(CsvIndex itemIndex)
         {
-            foreach (CsvItem item in this.items)
+            foreach (CsvItem item in this.items.Values)
             {
-                if (item.index == itemIndex)
+                if (item.index.Equals(itemIndex))
                 {
                     return item;
                 }
@@ -202,19 +75,28 @@ namespace Csv
             return null;
         }
 
+        public void SetItem(CsvIndex itemIndex, CsvItem item)
+        {
+            this.items[itemIndex] = item;
+        }
+
         public IEnumerator GetEnumerator()
         {
-            return this.items.GetEnumerator();
+            return this.items.Values.GetEnumerator();
         }
 
         public void Save(StreamWriter stream)
         {
-            if (this.items.Count > 0)
-                stream.Write(this.items[0].ToSaveableString());
-            for (int i=1;i<this.items.Count;i++)
+            bool first = true;
+            foreach (CsvItem item in this.items.Values)
             {
+                stream.Write(item.ToSaveableString());
+                if (first)
+                {
+                    first = false;
+                    continue;
+                }
                 stream.Write(',');
-                stream.Write(this.items[i].ToSaveableString());
             }
             stream.WriteLine();
         }
@@ -224,11 +106,11 @@ namespace Csv
             return new CsvRow(this);
         }
 
-        internal bool HasItemIndex(int index)
+        internal bool HasItemIndex(CsvIndex collectionIndex)
         {
             foreach (CsvItem item in this)
             {
-                if (item.index == index)
+                if (item.index.Equals(collectionIndex))
                 {
                     return true;
                 }
@@ -236,25 +118,49 @@ namespace Csv
             return false;
         }
 
-        internal void SortItemsIndexes()
+        public int CompareTo(CsvItemCollction other)
         {
-            this.items.Sort();
+            return this.index.CompareTo(other.index);
+        }
+    }
+
+    public class CsvRow : CsvItemCollction
+    {
+        public CsvRow() : base()
+        { }
+        public CsvRow(CsvItemCollction row) : base(row)
+        { }
+        public CsvRow(int rowIndex)
+        {
+            this.index = new CsvIndex(rowIndex, IndexType.Row);
+        }
+    }
+
+    public class CsvColumn : CsvItemCollction
+    {
+        public CsvColumn() : base()
+        { }
+        public CsvColumn(CsvItemCollction row) : base(row)
+        { }
+        public CsvColumn(int rowIndex)
+        {
+            this.index = new CsvIndex(rowIndex, IndexType.Column);
         }
     }
 
 
-    public abstract class CsvItem : ICloneable, IComparable
+    public abstract class CsvItem
     {
         public static readonly CsvItem Null = new CsvItemNull();
-        public static CsvItem CreateCsvItem(object value, CsvRow parent, int index)
+        public static CsvItem CreateCsvItem(object value, CsvItemCollction parent, CsvIndex index)
         {
-            if (value is null || (value is string && (string)value == ""))
+            if (value is string && string.IsNullOrEmpty((string)value) || string.IsNullOrWhiteSpace((string)value))
             {
                 return CreateNullCsvItem(parent, index);
             }
             return new CsvString((string)value, parent, index);
         }
-        public static CsvItem CreateNullCsvItem(CsvRow parent, int index)
+        public static CsvItem CreateNullCsvItem(CsvItemCollction parent, CsvIndex index)
         {
             CsvItemNull item = new CsvItemNull();
             item.index = index;
@@ -277,35 +183,17 @@ namespace Csv
             }
             return count;
         }
-        public static List<CsvItem> GetUniqueItems(List<CsvItem> items)
+        public static List<CsvItem> GetUniqueItems(CsvItemCollction itemCollction)
         {
-            items = new List<CsvItem>(items);
-            for (int i = 0; i < items.Count; i++)
-            {
-                object iValue = items[i].GetValue();
-                if (iValue == null)
-                {
-                    items.RemoveAt(i);
-                    i--;
-                    continue;
-                }
-                for (int j = i + 1; j < items.Count; j++)
-                {
-                    object jValue = items[j].GetValue();
-                    if (iValue.Equals(jValue))
-                    {
-                        items.RemoveAt(j);
-                        j--;
-                    }
-                }
-            }
-            return items;
+            HashSet<CsvItem> uniqueItems = new HashSet<CsvItem>(itemCollction.items.Values, new ValueComparer());
+            //uniqueItems.ExceptWith(null);
+            return new List<CsvItem>(uniqueItems);
         }
 
-        protected CsvRow parent = null;
-        public int index = -1;
+        protected CsvItemCollction parent = null;
+        public CsvIndex index;
 
-        public abstract object GetValue();
+        public abstract IComparable GetValue(); 
         public abstract Type GetValueType();
 
         public abstract void UpdateValue(object value);
@@ -314,49 +202,86 @@ namespace Csv
         {
             return this is CsvItemNull;
         }
-        public CsvRow GetParent()
+        public CsvItemCollction GetParent()
         {
             return parent;
         }
-        public abstract object Clone();
+        public abstract CsvItem Clone(CsvItemCollction parent);
         public override abstract string ToString();
         public abstract string ToSaveableString();
 
-        public int CompareTo(object obj)
-        {
-            return this.index - ((CsvItem)obj).index;
-        }
-
         private class CsvItemNull : CsvItem
         {
-            public override object Clone()
+            public override CsvItem Clone(CsvItemCollction parent)
             {
-                return this;
+                return Null;
             }
-
-            public override object GetValue()
+            public override IComparable GetValue()
             {
                 return null;
             }
-
             public override Type GetValueType()
             {
                 return null;
             }
-
             public override string ToSaveableString()
             {
                 return "";
             }
-
             public override string ToString()
             {
                 return "";
             }
-
             public override void UpdateValue(object value)
             {
                 return;
+            }
+        }
+
+        public class ValueComparer : IComparer<CsvItem>, IEqualityComparer<CsvItem>
+        {
+            public int Compare(CsvItem x, CsvItem y)
+            {
+                if (x.GetValue() == null)
+                {
+                    return y.GetValue() == null ? 0 : -1;
+                }
+                return x.GetValue().CompareTo(y.GetValue());
+            }
+
+            public bool Equals(CsvItem x, CsvItem y)
+            {
+                if (x.GetValue() == null)
+                {
+                    return y.GetValue() == null;
+                }
+                return x.GetValue().Equals(y.GetValue());
+            }
+
+            public int GetHashCode(CsvItem obj)
+            {
+                if (obj.GetValue() == null)
+                {
+                    return 0;
+                }
+                return obj.GetValue().GetHashCode();
+            }
+        }
+        public class IndexComparer : IComparer<CsvItem>, IEqualityComparer<CsvItem>
+        {
+            public int Compare(CsvItem x, CsvItem y)
+            {
+                return x.index.CompareTo(y.index);
+            }
+
+            public bool Equals(CsvItem x, CsvItem y)
+            {
+                return x.index.Equals(y.index);
+            }
+
+            public int GetHashCode(CsvItem obj)
+            {
+                return obj.index.GetHashCode();
             }
         }
     }
@@ -369,18 +294,21 @@ namespace Csv
         {
             this.value = str;
         }
-        public CsvString(string str, CsvRow parent) : this(str)
+        public CsvString(string str, CsvItemCollction parent) : this(str)
         {
             this.parent = parent;
         }
-        public CsvString(string str, CsvRow parent, int itemIndex) : this(str, parent)
+        public CsvString(string str, CsvItemCollction parent, CsvIndex itemIndex) : this(str, parent)
         {
             this.index = itemIndex;
         }
-        public CsvString(CsvString item) : this(item.value, item.parent)
+        public CsvString(CsvString item, CsvItemCollction parent)
         {
+            this.value = item.value;
+            this.parent = parent;
+            this.index = item.index;
         }
-        public override object GetValue()
+        public override IComparable GetValue()
         {
             return this.value;
         }
@@ -391,11 +319,6 @@ namespace Csv
         public override void UpdateValue(object value)
         {
             this.value = (string)value;
-        }
-
-        public override object Clone()
-        {
-            return new CsvString(this);
         }
 
         public override string ToString()
@@ -410,6 +333,114 @@ namespace Csv
                 return '"' + this.value + '"';
             }
             return this.value;
+        }
+
+        public override CsvItem Clone(CsvItemCollction parent)
+        {
+            return new CsvString(this, parent);
+        }
+    }
+
+    public enum IndexType { Column, Row }
+
+    public class CsvIndex: IComparable<CsvIndex>, IEquatable<CsvIndex>, ICloneable
+    {
+        private int row = -1;
+        private int column = -1;
+
+        public CsvIndex()
+        { }
+        public CsvIndex(CsvIndex index)
+        {
+            this.row = index.row;
+            this.column = index.column;
+        }
+        public CsvIndex(int index, IndexType indexType)
+        {
+            if (indexType == IndexType.Column)
+            {
+                this.column = index;
+            }
+            else
+            {
+                this.row = index;
+            }
+        }
+        public CsvIndex(int rowIndex, int columnIndex)
+        {
+            this.row = rowIndex;
+            this.column = columnIndex;
+        }
+
+        public int GetIndex(IndexType indexType)
+        {
+            if (indexType == IndexType.Column)
+            {
+                return this.column;
+            }
+            else
+            {
+                return this.row;
+            }
+        }
+
+        public int GetRowIndex()
+        {
+            return this.row;
+        }
+        public int GetColumnIndex()
+        {
+            return this.column;
+        }
+
+        public int CompareTo(CsvIndex other)
+        {
+            return this.row - other.row + this.column - other.column;
+        }
+
+        public override string ToString()
+        {
+            string str = "";
+            if (row >= 0)
+            {
+                str += row;
+            }
+            if (column >= 0)
+            {
+                if (!str.Equals(""))
+                    str += " ";
+                str += column;
+            }
+            return str;
+        }
+        public override int GetHashCode()
+        {
+            return row.GetHashCode() + column.GetHashCode();
+        }
+
+        public bool Equals(CsvIndex other)
+        {
+            bool rowEquals = this.row == other.row;
+            bool columnEquals = this.column == other.column;
+            return ((this.row > 0 && other.row > 0) ? rowEquals : true) && ((this.column > 0 && other.column > 0) ? columnEquals : true);
+        }
+
+        public object Clone()
+        {
+            return new CsvIndex(this);
+        }
+
+        public static bool operator ==(CsvIndex i1, CsvIndex i2)
+        {
+            return i1.Equals(i2);
+        }
+        public static bool operator !=(CsvIndex i1, CsvIndex i2)
+        {
+            return !i1.Equals(i2);
+        }
+        public static CsvIndex operator -(CsvIndex i1, CsvIndex i2)
+        {
+            return new CsvIndex(i1.row - i2.row, i1.column - i2.column);
         }
     }
 }
