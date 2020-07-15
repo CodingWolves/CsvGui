@@ -141,7 +141,7 @@ namespace CsvGui
             queryForm.name = form.name + "_SelectedRowsItemValuesByColumn"+ columnIndex;
             foreach (CsvItem item in items)
             {
-                queryForm.Append(CsvQuery.GetRowsContainsValue(form, item, false));
+                queryForm.Append(CsvQuery.GetRowsContainsValue(form, item, false),true);
             }
         }
 
@@ -159,39 +159,86 @@ namespace CsvGui
             }
         }
 
+        private IEnumerator<CsvItemCollction> OperationItemComboBoxEnumerator = null;
+        private const int ItemsLoadLimit = 100;
+        private int lastLoadedOperationItemIndex = 0;
+        private string ViewMoreString = "[View More]";
         private void OperationOnComboBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
             OperationItemComboBox1.Items.Clear();
+            lastLoadedOperationItemIndex = 0;
+            List<CsvItemCollction> OperationItemComboBoxList = new List<CsvItemCollction>();
             switch ((string)OperationOnComboBox1.SelectedItem)
             {
                 case "Columns":
                     {
-                        foreach (CsvItem item in form.headRow)
+                        foreach (CsvColumn column in form.GetColumns())
                         {
-                            OperationItemComboBox1.Items.Add(item.index);
+                            OperationItemComboBoxList.Add(column);
                         }
                     }
                     break;
                 case "Rows":
                     {
-                        foreach (CsvIndex index in form.GetRowIndexes())
+                        foreach (CsvRow row in form.GetRows())
                         {
-                            OperationItemComboBox1.Items.Add(index);
+                            OperationItemComboBoxList.Add(row);
                         }
                     }
                     break;
                 case "All":
                     {
-                        foreach (CsvItem item in form.headRow)
+                        foreach (CsvColumn column in form.GetColumns())
                         {
-                            OperationItemComboBox1.Items.Add(item.index);
+                            OperationItemComboBoxList.Add(column);
                         }
-                        foreach (CsvIndex index in form.GetRowIndexes())
+                        foreach (CsvRow row in form.GetRows())
                         {
-                            OperationItemComboBox1.Items.Add(index);
+                            OperationItemComboBoxList.Add(row);
                         }
                     }
                     break;
+            }
+            int count = 0;
+            OperationItemComboBoxEnumerator = OperationItemComboBoxList.GetEnumerator();
+            while (OperationItemComboBoxEnumerator.MoveNext())
+            {
+                if (count < ItemsLoadLimit)
+                {
+                    OperationItemComboBox1.Items.Add(OperationItemComboBoxEnumerator.Current);
+                    lastLoadedOperationItemIndex++;
+                    count++;
+                    continue;
+                }
+                break;
+            }
+            if (lastLoadedOperationItemIndex < OperationItemComboBoxList.Count)
+            {
+                OperationItemComboBox1.Items.Add(ViewMoreString);
+            }
+
+        }
+
+        private void OperationItemComboBox1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (OperationItemComboBox1.SelectedItem.Equals(ViewMoreString))
+            {
+                OperationItemComboBox1.Items.Remove(ViewMoreString);
+                int count = 0;
+                do
+                {
+                    if (count++ >= ItemsLoadLimit)
+                    {
+                        break;
+                    }
+                    OperationItemComboBox1.Items.Add(OperationItemComboBoxEnumerator.Current);
+                    lastLoadedOperationItemIndex++;
+                }
+                while (OperationItemComboBoxEnumerator.MoveNext());
+                if (OperationItemComboBoxEnumerator.Current != null)
+                {
+                    OperationItemComboBox1.Items.Add(ViewMoreString);
+                }
             }
         }
 

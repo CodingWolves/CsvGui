@@ -36,14 +36,7 @@ namespace Csv
                 CsvColumn column = form.GetColumn(columnIndex);
                 foreach (CsvItem item in column)
                 {
-                    if (connected == false)
-                    {
-                        newForm.AppendColumn((CsvColumn)column.Clone());
-                    }
-                    else
-                    {
-                        newForm.AppendColumn(column);
-                    }
+                    newForm.Append(column, connected);
                 }
             }
             return newForm;
@@ -53,36 +46,9 @@ namespace Csv
             CsvForm newForm = (CsvForm)form.Clone();
             newForm.name = form.name + "_RowsContainsValueQuery";
 
-            newForm.RowProgressionComparer(KeepRowsContainsItemValue, item);
+            //TODO 
 
             return newForm;
         }
-
-        private static int KeepRowsContainsItemValue(CsvForm form,CsvRow row, CsvItem comparedItem)
-        {
-            if (row.GetAllValues().Contains(comparedItem.GetValue()))
-            {
-                return 1;
-            }
-            else
-            {
-                form.RemoveRow(row.index.GetRowIndex());
-                return 1;
-            }
-        }
-
-        //private static int KeepColumnIndex(CsvForm form, CsvColumn column, CsvItem comparedItem)
-        //{
-        //    if (column.index.GetColumnIndex() == comparedItem.index.GetColumnIndex())
-        //    {
-        //        return 1;
-        //    }
-        //    else
-        //    {
-        //        form.RemoveColumn(column.index.GetColumnIndex());
-        //        return 0;
-        //    }
-        //}
-
     }
 }

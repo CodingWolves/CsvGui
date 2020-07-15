@@ -75,7 +75,7 @@ namespace Csv
                 }
                 if (string.IsNullOrEmpty(itemValue) == false && string.IsNullOrWhiteSpace(itemValue) == false)
                 {
-                    row.AddItem(CsvItem.CreateCsvItem(itemValue, row, new CsvIndex(rowIndex, ++itemCount)));
+                    row.Append(CsvItem.CreateCsvItem(itemValue, row, new CsvIndex(rowIndex, ++itemCount)),false);
                 }
                 else
                 {

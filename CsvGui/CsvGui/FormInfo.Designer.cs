@@ -28,10 +28,10 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.ListViewItem listViewItem1 = new System.Windows.Forms.ListViewItem(new string[] {
+            System.Windows.Forms.ListViewItem listViewItem13 = new System.Windows.Forms.ListViewItem(new string[] {
             "123"}, -1, System.Drawing.Color.Empty, System.Drawing.SystemColors.Window, null);
-            System.Windows.Forms.ListViewItem listViewItem2 = new System.Windows.Forms.ListViewItem("5643");
-            System.Windows.Forms.ListViewItem listViewItem3 = new System.Windows.Forms.ListViewItem("hgj");
+            System.Windows.Forms.ListViewItem listViewItem14 = new System.Windows.Forms.ListViewItem("5643");
+            System.Windows.Forms.ListViewItem listViewItem15 = new System.Windows.Forms.ListViewItem("hgj");
             this.label1 = new System.Windows.Forms.Label();
             this.FilenameTextBox = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
@@ -39,6 +39,7 @@
             this.label3 = new System.Windows.Forms.Label();
             this.RowCountTextBox = new System.Windows.Forms.TextBox();
             this.ColumnHeaderValuesPanel = new System.Windows.Forms.Panel();
+            this.ColumnValuesOpenSelectedButton = new System.Windows.Forms.Button();
             this.ColumnValuesViewMoreButton = new System.Windows.Forms.Button();
             this.NullValuesLabel = new System.Windows.Forms.Label();
             this.ColumnHeaderValuesListView = new System.Windows.Forms.ListView();
@@ -63,7 +64,6 @@
             this.comboBox4 = new System.Windows.Forms.ComboBox();
             this.OperationItemComboBox1 = new System.Windows.Forms.ComboBox();
             this.OperationOnComboBox1 = new System.Windows.Forms.ComboBox();
-            this.ColumnValuesOpenSelectedButton = new System.Windows.Forms.Button();
             this.ColumnHeaderValuesPanel.SuspendLayout();
             this.panel2.SuspendLayout();
             this.menuStrip1.SuspendLayout();
@@ -150,6 +150,16 @@
             this.ColumnHeaderValuesPanel.TabIndex = 4;
             this.ColumnHeaderValuesPanel.Visible = false;
             // 
+            // ColumnValuesOpenSelectedButton
+            // 
+            this.ColumnValuesOpenSelectedButton.Location = new System.Drawing.Point(8, 135);
+            this.ColumnValuesOpenSelectedButton.Name = "ColumnValuesOpenSelectedButton";
+            this.ColumnValuesOpenSelectedButton.Size = new System.Drawing.Size(128, 23);
+            this.ColumnValuesOpenSelectedButton.TabIndex = 4;
+            this.ColumnValuesOpenSelectedButton.Text = "Open Selected Values";
+            this.ColumnValuesOpenSelectedButton.UseVisualStyleBackColor = true;
+            this.ColumnValuesOpenSelectedButton.Click += new System.EventHandler(this.ColumnValuesOpenSelectedButton_Click);
+            // 
             // ColumnValuesViewMoreButton
             // 
             this.ColumnValuesViewMoreButton.Location = new System.Drawing.Point(297, 123);
@@ -173,11 +183,11 @@
             // ColumnHeaderValuesListView
             // 
             this.ColumnHeaderValuesListView.HideSelection = false;
-            listViewItem1.StateImageIndex = 0;
+            listViewItem13.StateImageIndex = 0;
             this.ColumnHeaderValuesListView.Items.AddRange(new System.Windows.Forms.ListViewItem[] {
-            listViewItem1,
-            listViewItem2,
-            listViewItem3});
+            listViewItem13,
+            listViewItem14,
+            listViewItem15});
             this.ColumnHeaderValuesListView.Location = new System.Drawing.Point(8, 21);
             this.ColumnHeaderValuesListView.Name = "ColumnHeaderValuesListView";
             this.ColumnHeaderValuesListView.Size = new System.Drawing.Size(364, 96);
@@ -260,14 +270,14 @@
             // openToolStripMenuItem
             // 
             this.openToolStripMenuItem.Name = "openToolStripMenuItem";
-            this.openToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.openToolStripMenuItem.Size = new System.Drawing.Size(103, 22);
             this.openToolStripMenuItem.Text = "Open";
             this.openToolStripMenuItem.Click += new System.EventHandler(this.openToolStripMenuItem_Click);
             // 
             // saveToolStripMenuItem
             // 
             this.saveToolStripMenuItem.Name = "saveToolStripMenuItem";
-            this.saveToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.saveToolStripMenuItem.Size = new System.Drawing.Size(103, 22);
             this.saveToolStripMenuItem.Text = "Save";
             this.saveToolStripMenuItem.Click += new System.EventHandler(this.saveToolStripMenuItem_Click);
             // 
@@ -389,6 +399,7 @@
             this.OperationItemComboBox1.Name = "OperationItemComboBox1";
             this.OperationItemComboBox1.Size = new System.Drawing.Size(90, 21);
             this.OperationItemComboBox1.TabIndex = 8;
+            this.OperationItemComboBox1.SelectedIndexChanged += new System.EventHandler(this.OperationItemComboBox1_SelectedIndexChanged);
             // 
             // OperationOnComboBox1
             // 
@@ -403,16 +414,6 @@
             this.OperationOnComboBox1.Size = new System.Drawing.Size(72, 21);
             this.OperationOnComboBox1.TabIndex = 8;
             this.OperationOnComboBox1.SelectedIndexChanged += new System.EventHandler(this.OperationOnComboBox1_SelectedIndexChanged);
-            // 
-            // ColumnValuesOpenSelectedButton
-            // 
-            this.ColumnValuesOpenSelectedButton.Location = new System.Drawing.Point(8, 135);
-            this.ColumnValuesOpenSelectedButton.Name = "ColumnValuesOpenSelectedButton";
-            this.ColumnValuesOpenSelectedButton.Size = new System.Drawing.Size(128, 23);
-            this.ColumnValuesOpenSelectedButton.TabIndex = 4;
-            this.ColumnValuesOpenSelectedButton.Text = "Open Selected Values";
-            this.ColumnValuesOpenSelectedButton.UseVisualStyleBackColor = true;
-            this.ColumnValuesOpenSelectedButton.Click += new System.EventHandler(this.ColumnValuesOpenSelectedButton_Click);
             // 
             // FormInfo
             // 

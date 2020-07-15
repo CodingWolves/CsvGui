@@ -11,14 +11,14 @@ namespace Csv
 {
     public class CsvForm : IEnumerable, ICloneable
     {
-        public Dictionary<CsvIndex, CsvRow> rowDictionary = null;
+        public Dictionary<int, CsvRow> rowDictionary = null;
         public CsvRow headRow = null;
         public string name = null;
         public string filePath = null;
         public CsvForm()
         {
             this.headRow = new CsvRow();
-            this.rowDictionary = new Dictionary<CsvIndex, CsvRow>();
+            this.rowDictionary = new Dictionary<int, CsvRow>();
         }
         public CsvForm(CsvForm form) : this()
         {
@@ -81,63 +81,57 @@ namespace Csv
             this.headRow = headRow;
         }
 
-        public void AppendItem(CsvItem item)
+        public void Append(CsvItem item, bool clone)
         {
             CsvRow row = GetRow(item.index.GetRowIndex());
             if (row != null)
             {
-                row.UpdateValue(item.index, item.GetValue());
+                row.Append(item, clone);
             }
             else
             {
                 row = new CsvRow(item.index.GetRowIndex());
-                row.AddItem(item);
+                row.Append(item, clone);
                 this.rowDictionary.Add(row.index, row);
             }
         }
-        public void AppendRow(CsvRow row)
+        public void Append(CsvRow row, bool clone)
         {
             CsvRow formRow = GetRow(row.index);
             if (formRow != null)
             {
-                foreach (CsvItem newItem in row) // checking every item in row
-                {
-                    if (formRow.HasItemIndex(newItem.index))
-                    {
-                        formRow.UpdateValue(newItem.index, newItem.GetValue());
-                    }
-                    else
-                    {
-                        formRow.AddItem(newItem);
-                    }
-                }
+                formRow.Append(row, clone);
             }
             else
             {
-                formRow = row;
+                if (clone)
+                {
+                    formRow = row.Clone();
+                }
+                else
+                {
+                    formRow = row;
+                }
                 this.AddRow(row);
             }
             ExpandHeadRow(formRow);
         }
-        public void AppendColumn(CsvColumn column)
+        public void Append(CsvColumn column, bool clone)
         {
             foreach (CsvItem item in column)
             {
-                AppendItem(item);
+                Append(item, clone);
             }
         }
-        public void Append(CsvForm form)
+        public void Append(CsvForm form,bool clone)
         {
             if (form.headRow != null)
             {
-                foreach (CsvItem item in form.headRow)
-                {
-                    this.headRow.UpdateValue(item.index, item.GetValue());
-                }
+                this.headRow.Append(form.headRow, clone);
             }
             foreach(CsvRow row in form)
             {
-                this.AppendRow(row);
+                this.Append(row, clone);
             }
         }
 
@@ -145,59 +139,89 @@ namespace Csv
         {
             foreach (CsvItem item in row)
             {
-                if (headRow.HasItemIndex(item.index) == false)
+                if (headRow.HasIndex(item.index.GetColumnIndex()) == false)
                 {
-                    headRow.AddItem(CsvItem.CreateNullCsvItem(headRow, item.index));
+                    headRow.Append(CsvItem.CreateNullCsvItem(headRow, item.index), false);
                 }
             }
         }
-        /// <summary>
-        /// Searches in all items an item out of column, long procedure, not recommended
-        /// </summary>
+
+        // need to find if fast or not
         public void ExpandHeadRow()
         {
             HashSet<int> columnIndexes = new HashSet<int>();
             foreach (CsvRow row in this)
             {
-                foreach (CsvItem item in row)
+                foreach (int index in row.items.Keys)
                 {
-                    columnIndexes.Add(item.index.GetColumnIndex());
+                    columnIndexes.Add(index);
                 }
             }
-            foreach (int columnIndex in columnIndexes)
+            foreach (int columnIndex in columnIndexes) // start to here - humongus.csv 23ms
             {
-                CsvIndex index = new CsvIndex(columnIndex, IndexType.Column);
-                if (headRow.HasItemIndex(index) == false)
+                if (headRow.HasIndex(columnIndex) == false)
                 {
-                    headRow.AddItem(CsvItem.CreateNullCsvItem(headRow, index));
+                    headRow.Append(CsvItem.CreateNullCsvItem(headRow, columnIndex, IndexType.Column),false);
                 }
             }
         }
 
+        public bool HasRow(int rowIndex)
+        {
+            return rowDictionary.ContainsKey(rowIndex);
+        }
         public CsvRow GetRow(int rowIndex)
         {
-            CsvIndex index = new CsvIndex(rowIndex, IndexType.Row);
-            return this.rowDictionary[index];
+            if (HasRow(rowIndex))
+            {
+                return this.rowDictionary[rowIndex];
+            }
+            return null;
         }
-        public CsvRow GetRow(CsvIndex index)
+        public List<CsvRow> GetRows()
         {
-            if (this.rowDictionary.ContainsKey(index) == false)
-                return null;
-            return this.rowDictionary[index];
+            return rowDictionary.Values.ToList();
         }
 
         public CsvColumn GetColumn(int columnIndex)
         {
-            CsvColumn column = new CsvColumn(this.rowDictionary.Count);
+            CsvColumn column = new CsvColumn(columnIndex);
             foreach (CsvRow row in this)
             {
-                CsvItem rowItem = row.GetItem(new CsvIndex(columnIndex, IndexType.Column));
-                if (rowItem != null)
+                List<CsvItem> itemList = row.Where((CsvItem item) => item.index.GetColumnIndex() == columnIndex);
+                foreach (CsvItem item in itemList)
                 {
-                    column.AddItem(rowItem);
+                    column.Append(item,false);
                 }
             }
             return column;
+        }
+        public List<CsvColumn> GetColumns()
+        {
+            List<CsvIndex> columnIndexes = GetColumnIndexes();
+            Dictionary<CsvIndex, CsvColumn> columns = new Dictionary<CsvIndex, CsvColumn>();
+            List<CsvItem> itemsCompared = new List<CsvItem>();
+            foreach (CsvIndex index in columnIndexes)
+            {
+                itemsCompared.Add(CsvItem.CreateCsvItemForIndex(index));
+            }
+            foreach (CsvRow row in this) // long operation
+            {
+                foreach (CsvItem item in row)
+                {
+                    CsvIndex itemColumnIndex = new CsvIndex(item.index.GetColumnIndex(), IndexType.Column);
+                    if (columns.ContainsKey(itemColumnIndex))
+                    {
+                        columns[itemColumnIndex].Append(item,false);
+                    }
+                    else
+                    {
+                        columns.Add(itemColumnIndex, new CsvColumn(itemColumnIndex.GetColumnIndex()));
+                        columns[itemColumnIndex].Append(item,false);
+                    }
+                }
+            }
+            return columns.Values.ToList();
         }
 
         public List<CsvIndex> GetRowIndexes()
@@ -206,7 +230,7 @@ namespace Csv
 
             foreach (CsvRow row in this)
             {
-                indexes.Add(row.index);
+                indexes.Add(new CsvIndex(row.index,IndexType.Row));
             }
 
             return indexes;
@@ -214,7 +238,6 @@ namespace Csv
         public List<CsvIndex> GetColumnIndexes()
         {
             List<CsvIndex> indexes = new List<CsvIndex>();
-
             foreach (CsvItem item in this.headRow)
             {
                 indexes.Add(item.index);
@@ -231,11 +254,22 @@ namespace Csv
 
         public void RemoveRow(int rowIndex)
         {
-            RemoveRow(new CsvIndex(rowIndex, IndexType.Row));
+            rowDictionary.Remove(rowIndex);
         }
-        public void RemoveRow(CsvIndex index)
+
+        public void RemoveColumn(int columnIndex)
         {
-            this.rowDictionary.Remove(index);
+            foreach (CsvRow row in this)
+            {
+                foreach (CsvItem item in row)
+                {
+                    row.RemoveAt(item.index.GetColumnIndex());
+                }
+            }
+        }
+        public void RemoveColumn(CsvIndex index)
+        {
+            RemoveColumn(index.GetColumnIndex());
         }
 
         public IEnumerator GetEnumerator()
@@ -254,42 +288,63 @@ namespace Csv
             this.filePath = filePath;
         }
 
+        public CsvForm WhereColumn(IEqualityComparer<CsvColumn> comparer, CsvColumn compared)
+        {
+            CsvForm newForm = new CsvForm();
+            List<CsvColumn> columns = GetColumns();
+            foreach (CsvColumn column in columns)
+            {
+                if (comparer.Equals(column, compared))
+                {
+                    newForm.Append(column,false);
+                }
+            }
+            return newForm;
+        }
+        public CsvForm WhereRow(IEqualityComparer<CsvRow> comparer, CsvRow compared)
+        {
+            CsvForm newForm = new CsvForm();
+            List<CsvRow> rows = new List<CsvRow>(rowDictionary.Values);
+            foreach (CsvRow row in rows)
+            {
+                if (comparer.Equals(row, compared))
+                {
+                    newForm.Append(row,true);
+                }
+            }
+            return newForm;
+        }
+
         public object Clone()
         {
             return new CsvForm(this);
         }
 
-        /// <summary>
-        /// do rowProgressionFunc as compared with comparedItem and returns the progress in rows (+1/-1/0/...)
-        /// </summary>
-        /// <param name="rowProgressionFunc">does things and returns the progress in rows</param>
-        /// <param name="comparedItem"></param>
-        public void RowProgressionComparer(Func<CsvForm, CsvRow, CsvItem, int> rowProgressionFunc, CsvItem comparedItem)
+
+        public List<CsvRow> Where(Func<CsvRow, bool> func)
         {
-            int i = 0;
-            List<CsvIndex> rowIndexes = this.GetRowIndexes();
-            while (i < rowIndexes.Count)
+            List<CsvRow> rows = new List<CsvRow>();
+            foreach (CsvRow row in this)
             {
-                CsvRow row = this.GetRow(rowIndexes[i].GetRowIndex());
-                i += rowProgressionFunc(this, row, comparedItem);
+                if (func(row))
+                {
+                    rows.Add(row);
+                }
             }
+            return rows;
         }
 
-        /// <summary>
-        /// do rowProgressionFunc as compared with comparedItem and returns the progress in rows (+1/-1/0/...)
-        /// </summary>
-        /// <param name="rowProgressionFunc">does things and returns the progress in rows</param>
-        /// <param name="comparedItem"></param>
-        public void ColumnProgressionComparer(Func<CsvForm, CsvColumn, CsvItem, int> rowProgressionFunc, CsvItem comparedItem)
+        public List<CsvColumn> Where(Func<CsvColumn, bool> func)
         {
-            int i = 0;
-            this.ExpandHeadRow();
-            List<CsvIndex> columnIndexes = this.GetColumnIndexes();
-            while (i < columnIndexes.Count)
+            List<CsvColumn> columns = new List<CsvColumn>();
+            foreach (CsvColumn column in this.GetColumns())
             {
-                CsvColumn column = this.GetColumn(columnIndexes[i].GetColumnIndex());
-                i += rowProgressionFunc(this, column, comparedItem);
+                if (func(column))
+                {
+                    columns.Add(column);
+                }
             }
+            return columns;
         }
     }
 }
