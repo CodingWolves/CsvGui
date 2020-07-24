@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(LoadingScreen));
             this.LoadingLabel = new System.Windows.Forms.Label();
             this.ProgressLabel = new System.Windows.Forms.Label();
             this.LoadingNameLabel = new System.Windows.Forms.Label();
@@ -78,6 +79,7 @@
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(264, 154);
             this.panel1.TabIndex = 3;
+            this.panel1.UseWaitCursor = true;
             // 
             // LoadingScreen
             // 
@@ -86,6 +88,7 @@
             this.ClientSize = new System.Drawing.Size(270, 160);
             this.Controls.Add(this.panel1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "LoadingScreen";
             this.Text = "LoadingScreen";
             this.UseWaitCursor = true;
